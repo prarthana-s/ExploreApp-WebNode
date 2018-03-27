@@ -23,3 +23,7 @@ img.placeIcon {
     border-radius: .1em;
     margin: .25em .25em .25em;
 }
+
+#detailsContent {
+    display: none;
+}

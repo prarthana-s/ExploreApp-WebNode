@@ -36,7 +36,6 @@ function fillInAddress() {
 
 // Handling of radio buttons
 var radioSelectionLoc = document.getElementById('locationRadioLoc');
-console.log(radioSelectionLoc);
 var radioSelectionHere = document.getElementById('locationRadioHere');        
 var textInput = document.getElementById("locationInputText");
 
@@ -95,10 +94,7 @@ function submitForm() {
         var lat = formElems.namedItem("hereLatitude").value;
         var lon = formElems.namedItem("hereLongitude").value;
 
-        console.log(formElems.namedItem("locationRadio").value);
-
         if (!autocompleteFlag && formElems.namedItem("locationRadio").value == 'location') {
-            console.log("double call!");
             $.ajax({
                 method: "GET",
                 url: "http://localhost:3000/geocode",
@@ -116,13 +112,11 @@ function submitForm() {
                         data: {keyword: formElems.namedItem("keyword").value, category: formElems.namedItem("category").value, distance: formElems.namedItem("distance").value, locationRadio: formElems.namedItem("locationRadio").value, locationInput: formElems.namedItem("locationInput").value, hereLatitude: lat, hereLongitude: lon}
                         })
                         .done(function( result ) {
-                            // console.log(msg);
                             constructResultsTable(JSON.stringify(result),0);
                         });
                 });
         }
         else {
-            console.log("single call!");
             // AJAX call to PHP script to fetch nearby places JSON data
             $.ajax({
                 method: "GET",
@@ -137,16 +131,26 @@ function submitForm() {
     }
 }
 
-function constructResultsTable(result, nextTracker) {
+// var prevPageFlag;
+// var prevResult;
+
+function constructResultsTable(result, tracker) {
     jsonObj = result;
 
     if (jsonObj) {
         jsonObj = JSON.parse(jsonObj);
-        console.log(jsonObj);
         var nextPageToken = jsonObj.next_page_token;
         var results = jsonObj.results;
         var myLat = jsonObj.lat;
         var myLon = jsonObj.lon;
+
+        // if (tracker) {
+        //     prevPageFlag = 1;
+        //     prevResult = result;
+        // }
+        // else {
+        //     prevResult = result;
+        // }
 
         var existingTable = document.getElementById('tableContainer');
         if (existingTable) {
@@ -175,7 +179,7 @@ function constructResultsTable(result, nextTracker) {
                 var lat = results[i].geometry.location.lat;
                 var lng = results[i].geometry.location.lng;
 
-                tableHTML += '<tr><th scope="row">' + (parseInt(i)+nextTracker+1) + '</th>' +
+                tableHTML += '<tr><th scope="row">' + (parseInt(i)+1) + '</th>' +
                 '<td><img class="placeIcon" src="' + icon + '" alt="user image"/></td>' + 
                 '<td class="placeName" data-placeid="' + placeID + '">' + name + '</td>' +
                 '<td class="addressInfo">' + address + '</td>' + 
@@ -186,9 +190,13 @@ function constructResultsTable(result, nextTracker) {
             tableHTML += '</table></div>';
         }
 
+        // if (prevPageFlag) {
+        //     console.log("show previous button");
+        //     tableHTML += '<button type="button" id="prevButton" class="btn btn-outline-dark">Previous</button>';
+        // }
+
         if (nextPageToken && nextPageToken.length) {
-            console.log("show next button");
-            tableHTML += '<div><button type="button" id="nextButton" class="btn btn-outline-dark" data-token="' + nextPageToken + '" data-tracker="' + nextTracker + '">Next</button></div>';
+            tableHTML += '<button type="button" id="nextButton" class="btn btn-outline-dark" data-token="' + nextPageToken + '">Next</button>';
         }
 
         var tableContainer =  document.getElementById('pills-results');
@@ -205,6 +213,11 @@ function constructResultsTable(result, nextTracker) {
             nextButton.addEventListener('click',displayNextResults,false);
         }
 
+        // var prevButton = document.getElementById('prevButton');
+        // if (prevButton) {
+        //     prevButton.addEventListener('click',displayPrevResults,false);
+        // }
+
     }
 }
 
@@ -217,8 +230,6 @@ function generateHTML(address, placeID, lat, lng) {
 
 function displayNextResults(ev) {
     var nextPageToken = ev.target.dataset.token;
-    var nextTracker = ev.target.dataset.tracker;
-    console.log(ev);
     $.ajax({
         method: "GET",
         url: "http://localhost:3000/nextPage",
@@ -226,27 +237,103 @@ function displayNextResults(ev) {
         data: {nextPageToken: nextPageToken}
         })
         .done(function( result ) {
-            constructResultsTable(JSON.stringify(result),parseInt(nextTracker)+20);
+            constructResultsTable(JSON.stringify(result),1);
         });
+}
+
+// function displayPrevResults(ev) {
+//     // constructResultsTable(JSON.stringify(prevResult),1);
+// }
+
+function convertPriceToDollar(price) {
+    if (price >= 0 && price <= 1) {
+        return "0";
+    }
+    else if (price > 1 && price <= 2) {
+        return "$";
+    }
+    else if (price > 2 && price <= 3) {
+        return "$$";
+    }
+    else if (price > 3 && price <= 4) {
+        return "$$$";
+    }
+    else {
+        return "$$$$";
+    }
+    
 }
 
 function processTableRowClick(ev){
     let target = ev.target.parentNode;
+
+    // Details icon
     if(target.className == 'detailsIcon') {
-        console.log(target);
+        var lat = target.dataset.lat;
+        var lng = target.dataset.lng;
+        var placeID = target.dataset.placeid;
+
+        var tabInterface = document.getElementById('detailsContent');
+        tabInterface.style.display = 'block';
+
         var map;
-        var request = {
-            placeId: target.placeID
-          };
-          
-          service = new google.maps.places.PlacesService(map);
-          service.getDetails(request, callback);
-          
-          function callback(place, status) {
+
+        function initialize() {
+            map = new google.maps.Map(document.getElementById('map'), {
+            center: {lat: parseFloat(lat), lng: parseFloat(lng)},
+            zoom: 15
+            });
+
+            var request = {
+            placeId: placeID
+            };
+            
+            service = new google.maps.places.PlacesService(map);
+            service.getDetails(request, callback);
+        }
+        
+        // Checks that the PlacesServiceStatus is OK, and adds a marker
+        // using the place ID and location from the PlacesService.
+        function callback(results, status) {
             if (status == google.maps.places.PlacesServiceStatus.OK) {
-              console.log(place);
+
+                var hours = results.opening_hours;
+                var hoursStatus = (hours.open_now == 1 ? "Open now:" : "Closed now:");
+                var dailyOpenModal = '<a href="#" data-toggle="modal" data-target="#exampleModalCenter">Daily Open Hours</a>';
+                var weekdayText = hours.weekday_text;
+
+                var info = {
+                    'Address' : results.formatted_address,
+                    'Phone Number' : results.international_phone_number,
+                    'Price Level': convertPriceToDollar(results.price_level),
+                    'Rating' : results.rating,
+                    'Google Page' :  '<a target="_blank" href="' + results.url + '">' + results.url + '</a>',
+                    'Website' : '<a target="_blank" href="' + results.website + '">' + results.website + '</a>',
+                    'Hours' : (results.open_now == 1 ? "Open Now" : "Closed Now") + " " + dailyOpenModal
+                }
+
+                var infoContainer = document.getElementById('infoTableBody');
+
+                var infoHTML = '';
+
+                Object.keys(info).forEach(function(key) {
+                    infoHTML += '<tr><th scope="row">' + key + '</th><td>' + info[key] + '</td></tr>';
+                });
+                infoContainer.innerHTML = infoHTML;
+
+                var openHoursModal = document.getElementById('main_modal_body');
+                var openHoursHTML = '<table class="table"><tbody>';
+
+                for (let i = 0 ; i < weekdayText.length ; i++) {
+                    openHoursHTML += '<tr><th scope="row">' + weekdayText[i] + '</th></tr>';
+                };
+                openHoursHTML += '</tbody></table></div>';
+                openHoursModal.innerHTML = openHoursHTML;
             }
-          }
+        }
+        
+        initialize();
+
     }
 }
     

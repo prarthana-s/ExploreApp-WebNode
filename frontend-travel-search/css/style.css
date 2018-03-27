@@ -1,0 +1,25 @@
+#formHeading {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    padding-bottom: 10px;
+}
+
+.panel-default {
+    background-color: #F7F7F7;
+}
+
+.col-form-label {
+    font-weight: normal;
+}
+
+img.placeIcon {
+    width: 40px;
+}
+
+.fa-star, .fa-chevron-right {
+    background-color: white;
+    border: solid .08em #eee;
+    border-radius: .1em;
+    margin: .25em .25em .25em;
+}

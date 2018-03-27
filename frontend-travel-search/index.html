@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>FrontendTravelSearch</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- <link rel="icon" type="image/x-icon" href="favicon.ico"> -->
+  <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js" integrity="sha384-SlE991lGASHoBfWbelyBPLsUlwY1GwNDJo3jSJO04KZ33K2bwfV9YBauFfnzvynJ" crossorigin="anonymous"></script>
+  <!-- <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/solid.js" integrity="sha384-+Ga2s7YBbhOD6nie0DzrZpJes+b2K1xkpKxTFFcx59QmVPaSA8c7pycsNaFwUK6l" crossorigin="anonymous"></script> -->
+  <!-- <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/fontawesome.js" integrity="sha384-7ox8Q2yzO/uWircfojVuCQOZl+ZZBg2D2J5nkpLqzH1HY0C1dHlTKIbpRz/LG23c" crossorigin="anonymous"></script> -->
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyANFqTMYqnjkhbs9BQ5BYdd8zc2RtvzcFc&libraries=places"></script>  
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="panel panel-default mainContainer">
+        <div class="panel-body">
+    
+            <div id="formHeading">Travel and Entertainment Search</div>
+    
+            <form id="mainForm" class="needs-validation" novalidate>
+    
+                <div class="form-group row keywordElement">
+                    <label for="keyword" class="col-sm-2 col-form-label">Keyword*</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="keyword" name="keyword" required>
+                        <!-- <div class="invalid-feedback">
+                            Please enter a keyword.
+                        </div> -->
+                    </div>
+                </div>
+    
+                <div class="form-group row">
+                    <label for="category" class="col-sm-2 col-form-label">Category</label>
+                    <div class="col-sm-6">
+                        <select class="form-control" id="category" name="category">
+                            <option value="default">Default</option>
+                            <option>Airport</option>
+                            <option>Amusement Park</option>
+                            <option>Aquarium</option>
+                            <option>Art Gallery</option>
+                            <option>Bakery</option>
+                            <option>Bar</option>
+                            <option>Beauty Salon</option>
+                            <option>Bowling Alley</option>
+                            <option>Bus Station</option>
+                            <option>Cafe</option>
+                            <option>Campground</option>
+                            <option>Car Rental</option>
+                            <option>Casino</option>
+                            <option>Lodging</option>
+                            <option>Movie Theater</option>
+                            <option>Museum</option>
+                            <option>Night Club</option>
+                            <option>Park</option>
+                            <option>Parking</option>
+                            <option>Restaurant</option>
+                            <option>Shopping Mall</option>
+                            <option>Stadium</option>
+                            <option>Subway Station</option>
+                            <option>Taxi Station</option>
+                            <option>Train Station</option>
+                            <option>Transit Station</option>
+                            <option>Travel Agency</option>
+                            <option>Zoo</option>
+                        </select>
+                    </div>
+                    </div>
+    
+                    <div class="form-group row">
+                        <label for="distance" class="col-sm-2 col-form-label">Distance (miles)</label>
+                        <div class="col-sm-6">
+                            <input type="number" class="form-control" name="distance" id="distance" placeholder="10" value="">
+                        </div>
+                    </div>
+    
+                    
+                <fieldset class="form-group">
+                    <div class="row">
+                    <label for="formFrom" class="col-form-label col-sm-2">From*</label>
+                    <div class="col-sm-6">
+                        <div class="form-check">
+                        <input class="form-check-input" type="radio" id="locationRadioHere" name="locationRadio" value="here" checked='checked' required>
+                        <label class="form-check-label" for="locationRadioHere">
+                            Current Location
+                        </label>
+                        </div>
+                        <div class="form-check">
+                        <input class="form-check-input"  type="radio" id="locationRadioLoc" name="locationRadio" value="location" required>
+                        <label class="form-check-label" for="otherLocation">
+                            Other. Please specify:
+                        </label>
+                        </div>
+    
+
+                        <input type="hidden" id="hereLatitude" name="hereLatitude" value="">
+                        <input type="hidden" id="hereLongitude" name="hereLongitude" value="">
+                        
+                        <input type="text" class="form-control" id="locationInputText" name="locationInput" placeholder="Enter a location" value="" disabled>
+                        <!-- <div class="invalid-feedback">
+                            Please enter a location.
+                        </div> -->
+    
+                    </div>
+                    </div>
+                </fieldset>
+    
+                <div class="form-group row">
+                    <div class="col-sm-10">
+                    <button type="button" id="searchButton" class="btn btn-primary" name="submit" value="search" disabled><i class="fas fa-search"></i>&nbsp;Search</button>
+                    <button type="clear" class="btn btn-primary" name="clear" value="clear">Clear</button>
+                    </div>
+                </div>
+            </form>
+    
+        </div>
+    </div>
+
+
+    <ul class="nav nav-pills mb-3 justify-content-center" id="pills-tab" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" id="pills-results-tab" data-toggle="pill" href="#pills-results" role="tab" aria-controls="pills-results" aria-selected="true">Results</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="pills-favourites-tab" data-toggle="pill" href="#pills-favorites" role="tab" aria-controls="pills-favorites" aria-selected="false">Favorites</a>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="pills-tabContent">
+        <div class="tab-pane fade show active" id="pills-results" role="tabpanel" aria-labelledby="pills-results-tab"></div>
+        <div class="tab-pane fade" id="pills-favorites" role="tabpanel" aria-labelledby="pills-favorites-tab">...</div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/style.css">  
+    <script src="js/main.js"></script>
+    </body>
+</html>

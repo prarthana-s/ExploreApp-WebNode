@@ -278,8 +278,8 @@ function processTableRowClick(ev){
 
         var map;
 
-        function initialize() {
-            map = new google.maps.Map(document.getElementById('map'), {
+        function getInfo() {
+            map = new google.maps.Map(document.getElementById('mapContainer'), {
             center: {lat: parseFloat(lat), lng: parseFloat(lng)},
             zoom: 15
             });
@@ -297,19 +297,49 @@ function processTableRowClick(ev){
         function callback(results, status) {
             if (status == google.maps.places.PlacesServiceStatus.OK) {
 
-                var hours = results.opening_hours;
-                var hoursStatus = (hours.open_now == 1 ? "Open now:" : "Closed now:");
-                var dailyOpenModal = '<a href="#" data-toggle="modal" data-target="#exampleModalCenter">Daily Open Hours</a>';
-                var weekdayText = hours.weekday_text;
+                // Info tab 
+                var info = {};
 
-                var info = {
-                    'Address' : results.formatted_address,
-                    'Phone Number' : results.international_phone_number,
-                    'Price Level': convertPriceToDollar(results.price_level),
-                    'Rating' : results.rating,
-                    'Google Page' :  '<a target="_blank" href="' + results.url + '">' + results.url + '</a>',
-                    'Website' : '<a target="_blank" href="' + results.website + '">' + results.website + '</a>',
-                    'Hours' : (results.open_now == 1 ? "Open Now" : "Closed Now") + " " + dailyOpenModal
+                if (results.formatted_address) {
+                    info['Address'] = results.formatted_address;
+                }
+
+                if (results.international_phone_number) {
+                    info['Phone Number'] = results.international_phone_number;
+                }
+
+                if (results.price_level) {
+                    info['Price Level'] = convertPriceToDollar(results.price_level);
+                }
+
+                if (results.rating) {
+                    info['Rating'] = results.rating;
+                }
+
+                if (results.url) {
+                    info['Google Page'] = '<a target="_blank" href="' + results.url + '">' + results.url + '</a>';
+                }
+
+                if (results.rating) {
+                    info['Website'] = '<a target="_blank" href="' + results.website + '">' + results.website + '</a>';
+                }
+
+                var hours = results.opening_hours;
+                if (hours) {
+                    var hoursStatus = (hours.open_now == 1 ? "Open now:" : "Closed now:");
+                    var dailyOpenModal = '<a href="#" data-toggle="modal" data-target="#exampleModalCenter">Daily Open Hours</a>';
+                    var weekdayText = hours.weekday_text;
+
+                    info['Hours'] = (results.open_now == 1 ? "Open Now" : "Closed Now") + " " + dailyOpenModal;
+
+                    var openHoursModal = document.getElementById('main_modal_body');
+                    var openHoursHTML = '<table class="table"><tbody>';
+    
+                    for (let i = 0 ; i < weekdayText.length ; i++) {
+                        openHoursHTML += '<tr><th scope="row">' + weekdayText[i] + '</th></tr>';
+                    };
+                    openHoursHTML += '</tbody></table></div>';
+                    openHoursModal.innerHTML = openHoursHTML;
                 }
 
                 var infoContainer = document.getElementById('infoTableBody');
@@ -321,18 +351,49 @@ function processTableRowClick(ev){
                 });
                 infoContainer.innerHTML = infoHTML;
 
-                var openHoursModal = document.getElementById('main_modal_body');
-                var openHoursHTML = '<table class="table"><tbody>';
 
-                for (let i = 0 ; i < weekdayText.length ; i++) {
-                    openHoursHTML += '<tr><th scope="row">' + weekdayText[i] + '</th></tr>';
-                };
-                openHoursHTML += '</tbody></table></div>';
-                openHoursModal.innerHTML = openHoursHTML;
+                // Photos
+                if (results.photos) {
+                    var numPhotos = results.photos.length;
+                    var rows;
+
+                    switch(numPhotos) {
+                        case 1,2,3,4: { rows = 1; break;}
+                        case 5,6,7,8: { rows = 2; break;}
+                        case 9,10: { rows = 3; break; }
+                    }
+
+                    var photosContainer = document.getElementById('photosDisplay');
+                    var photosHTML = '';
+                    var k = 0;
+                    for (let i = 0; i < rows; i++) {
+                        photosHTML += '<div class="row">';
+                        for (let j = 0; j < 4; j++) {
+                            if (k < numPhotos) {
+                                var photoLink = results.photos[k].getUrl({'maxWidth': results.photos[k].width , 'maxHeight': results.photos[k].height });                            
+                                k++;
+                                photosHTML += '<div class="col-sm-3"><a target="_blank" href="' + photoLink + '"><img class="img-fluid img-thumbnail" src="' + photoLink + '"/></a></div>'; 
+                            }
+                            else {
+                                break;
+                            }
+                        }
+                        photosHTML += '</div>';
+                    }
+                    photosContainer.innerHTML = photosHTML;
+                }
+
+                // No photos
+                else {
+                    var photosContainer = document.getElementById('photosDisplay');
+                    var photosHTML = '';
+                    photosContainer.innerHTML = photosHTML;
+                }
+
             }
         }
         
-        initialize();
+        getInfo();
 
     }
 }

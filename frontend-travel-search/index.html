@@ -150,7 +150,7 @@
         <div class="tab-content" id="myTabContent">
 
 
-            <div class="tab-pane fade show active" id="infoContainer" role="tabpanel" aria-labelledby="info-tab">
+            <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
                 <div class="table-responsive"> 
                     <table class="table table-striped">
                         <tbody id="infoTableBody">
@@ -160,18 +160,40 @@
             </div>
 
 
-            <div class="tab-pane fade" id="photosoContainer" role="tabpanel" aria-labelledby="photos-tab">
-
+            <div class="tab-pane fade" id="photos" role="tabpanel" aria-labelledby="photos-tab">
+                <div class="container" id="photosDisplay"></div>
             </div>
 
-
-            <div class="tab-pane fade" id="mapoContainer" role="tabpanel" aria-labelledby="map-tab">
-                <div id="map">
+            <div class="tab-pane fade" id="map" role="tabpanel" aria-labelledby="map-tab">
+                <div id="mapContainer">
                 </div>
             </div>
 
+            <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
+                <div id="ReviewsContainer">
+                    <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownReviews" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Google Reviews
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownReviews">
+                                <a class="dropdown-item" href="#">Google Reviews</a>
+                                <a class="dropdown-item" href="#">Yelp Reviews</a>
+                            </div>
 
-            <div class="tab-pane fade" id="reviewsoContainer" role="tabpanel" aria-labelledby="reviews-tab">...</div>
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownSort" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Default Order:
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownSory">
+                                <a class="dropdown-item" href="#">Default Order</a>
+                                <a class="dropdown-item" href="#">Highest Rating</a>
+                                <a class="dropdown-item" href="#">Lowest Rating</a>
+                                <a class="dropdown-item" href="#">Most Recent</a>
+                                <a class="dropdown-item" href="#">Least Recent</a>
+                            </div>
+                    </div>
+
+                </div>
+            </div>
         </div>
     </div>
 

@@ -17,7 +17,7 @@ img.placeIcon {
     width: 40px;
 }
 
-.fa-star, .fa-chevron-right {
+.fav, .fa-chevron-right {
     background-color: white;
     border: solid .08em #eee;
     border-radius: .1em;
@@ -26,4 +26,12 @@ img.placeIcon {
 
 #detailsContent {
     display: none;
+}
+
+.rating {
+    color: orange;
+}
+
+.authorName {
+    font-weight: bold;
 }

@@ -183,7 +183,7 @@ function constructResultsTable(result, tracker) {
                 '<td><img class="placeIcon" src="' + icon + '" alt="user image"/></td>' + 
                 '<td class="placeName" data-placeid="' + placeID + '">' + name + '</td>' +
                 '<td class="addressInfo">' + address + '</td>' + 
-                '<td class="favIcon"><i class="far fa-star fa-1x fa-pull-left fa-border"></i></td>' + 
+                '<td class="favIcon"><i class="far fa-star fa-1x fa-pull-left fa-border fav"></i></td>' + 
                 '<td class="detailsIcon" data-lat="' + lat + '" data-lng="' + lng + '" data-placeID="' + placeID +
                 '"><i class="fas fa-chevron-right fa-1x fa-pull-left fa-border"></i></td></tr>';
             }
@@ -298,6 +298,7 @@ function processTableRowClick(ev){
             if (status == google.maps.places.PlacesServiceStatus.OK) {
 
                 // Info tab 
+
                 var info = {};
 
                 if (results.formatted_address) {
@@ -388,6 +389,30 @@ function processTableRowClick(ev){
                     var photosContainer = document.getElementById('photosDisplay');
                     var photosHTML = '';
                     photosContainer.innerHTML = photosHTML;
+                }
+
+
+                // Google Reviews
+                var googleReviews = results.reviews;
+                if (googleReviews) {
+                    var reviewsHTML = '';
+
+                    for (let i = 0 ; i < googleReviews.length; i++) {
+                        var timestamp = moment(moment.unix(googleReviews[i].time)._d).format("YYYY-MM-DD HH:mm:ss");
+                        reviewsHTML += '<div class="card"><div class="card-body"> \
+                            <a target="_blank" href="' + googleReviews[i].author_url + '"><img class="authorPic" src="' + googleReviews[i].profile_photo_url + '"/></a>\
+                            <a target="_blank" href="' + googleReviews[i].author_url + '"><p class="card-text author-name authorName">' + googleReviews[i].author_name + '</p></a>';
+
+                        for (let j = 0 ; j < googleReviews[i].rating; j++) {
+                            reviewsHTML += '<i class="fas fa-star rating"></i>';
+                        }
+                            
+                        reviewsHTML += '<span class="card-text text-muted time-stamp">' + timestamp + '</span>' + 
+                            '<p class="card-text review-text">' + googleReviews[i].text + '</p></div></div>';
+                    }
+
+                    var reviewsContainer = document.getElementById('reviewsContainer');
+                    reviewsContainer.innerHTML = reviewsHTML;
                 }
 
             }

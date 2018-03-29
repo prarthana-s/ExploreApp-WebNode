@@ -457,6 +457,13 @@ function processTableRowClick(ev){
                 var toField = document.getElementById('toLocation');
                 toField.value = toFieldValue; 
 
+                var formElems = document.getElementById('directionsForm').elements;
+                formElems.namedItem("toLatitude").value = results.geometry.location.lat();
+                formElems.namedItem("toLongitude").value = results.geometry.location.lng();
+
+                var mapSubmitButton = document.getElementById('submitMapForm');
+                mapSubmitButton.addEventListener('click',getDirections,false);
+
             }
         }
         getInfo();
@@ -625,5 +632,49 @@ function dropdownAction(ev) {
 
 function fillInFromLocation() {
     var place = autocomplete.getPlace();
+    var formElems = document.getElementById('directionsForm').elements;
+    formElems.namedItem("fromLatitude").value = place.geometry.location.lat();
+    formElems.namedItem("fromLongitude").value = place.geometry.location.lng();
+}
+
+function getDirections(){
+    var formElems = document.getElementById('directionsForm').elements;
+
+    var toLat = formElems.namedItem("toLatitude").value;
+    var toLng = formElems.namedItem("toLongitude").value;
+    
+    var fromLat = formElems.namedItem("fromLatitude").value;
+    var fromLon = formElems.namedItem("fromLongitude").value;
+
+    var directionsService = new google.maps.DirectionsService();
+    var directionsDisplay = new google.maps.DirectionsRenderer();
+    var originCoords = new google.maps.LatLng(fromLat,fromLon);
+    var destCoords = new google.maps.LatLng(toLat,toLng);
+    var mapOptions = {
+        zoom: 15,
+        center: destCoords
+    }
+
+    map = new google.maps.Map(document.getElementById("mapContainer"), {
+        center: originCoords,
+        zoom: 15
+    });
+
+    var map = new google.maps.Map(document.getElementById("mapContainer"), mapOptions);
+    directionsDisplay.setMap(map);
+    directionsDisplay.setPanel(document.getElementById('directionsPanel'));
+
+    var request = {
+        origin: originCoords,
+        destination: destCoords,
+        travelMode: formElems.namedItem("travelMode").value.toUpperCase(),
+        provideRouteAlternatives: true
+    };
+    directionsService.route(request, function(response, status) {
+        if (status == 'OK') {
+        directionsDisplay.setDirections(response);
+        }
+    });
+
 }
     

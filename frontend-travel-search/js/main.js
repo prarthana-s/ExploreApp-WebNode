@@ -529,22 +529,33 @@ function dropdownAction(ev) {
     // TODO: Check if already being displayed
     // Page rescrolls to top, FIX THIS
     if (ev.target.parentNode.id == 'reviewsToggle') {
+        
+        let dropdownButton = document.getElementById('dropdownReviews');
+
         if (ev.target.id == 'yelpReviewsButton') {
             document.getElementById('yelpReviews').removeAttribute("hidden");;
-            document.getElementById('googleReviews').setAttribute("hidden","hidden");            
+            document.getElementById('googleReviews').setAttribute("hidden","hidden"); 
+            
+            dropdownButton.innerHTML = 'Yelp Reviews';
         }
         else if (ev.target.id == 'googleReviewsButton') {
             document.getElementById('yelpReviews').setAttribute("hidden","hidden");
-            document.getElementById('googleReviews').removeAttribute("hidden");            
+            document.getElementById('googleReviews').removeAttribute("hidden");     
+            
+            dropdownButton.innerHTML = 'Google Reviews';
         }
     }
 
     // Sort reviews
     else if (ev.target.parentNode.id == 'reviewsSort') {
-        console.log(yelpReviewsSet);
+
+        let dropdownButton = document.getElementById('dropdownSort');
+
         if(ev.target.id == 'defaultOrderSort') {
             generateYelpReviews(yelpReviewsSet,0);
             generateGoogleReviews(googleReviewsSet,0);
+
+            dropdownButton.innerHTML = 'Default Order';
         }
         else if(ev.target.id == 'highestRatingSort') {
             let tempYelpReviews = JSON.parse(JSON.stringify(yelpReviewsSet));
@@ -554,6 +565,8 @@ function dropdownAction(ev) {
             let tempGoogleReviews = JSON.parse(JSON.stringify(googleReviewsSet));
             tempGoogleReviews.sort(compareValues('rating', 'desc'));
             generateGoogleReviews(tempGoogleReviews,0);
+
+            dropdownButton.innerHTML = 'Highest Rating';
         }
         else if(ev.target.id == 'lowestRatingSort') {
             let tempYelpReviews = JSON.parse(JSON.stringify(yelpReviewsSet));
@@ -563,12 +576,14 @@ function dropdownAction(ev) {
             let tempGoogleReviews = JSON.parse(JSON.stringify(googleReviewsSet));
             tempGoogleReviews.sort(compareValues('rating'));
             generateGoogleReviews(tempGoogleReviews,0);
+
+            dropdownButton.innerHTML = 'Lowest Rating';
         }
         else if(ev.target.id == 'mostRecentSort') {
-            console.log("most recent rating");
+            dropdownButton.innerHTML = 'Most Recent';
         }
         else if(ev.target.id == 'leastRecentSort') {
-            console.log("least recent rating");
+            dropdownButton.innerHTML = 'Least Recent';
         }
     }
 }

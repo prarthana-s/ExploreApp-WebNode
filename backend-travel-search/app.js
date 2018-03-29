@@ -128,14 +128,11 @@ app.get('/yelpReviews', function(req, res) {
         country: placeCountry,
         postal_code: placePostalCode
     }).then(response => {
-        console.log(response);
         if (response.jsonBody.businesses.length != 0) {
 
             let id = response.jsonBody.businesses[0].id;
             client.reviews(id).then(response => {
-                console.log(response);
                 res.send(response.jsonBody.reviews);
-                // console.log(response.jsonBody.reviews[0].text);
             }).catch(e => {
                 console.log(e);
             });

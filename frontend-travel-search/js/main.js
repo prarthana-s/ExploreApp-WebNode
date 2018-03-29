@@ -8,6 +8,8 @@ var bodyElement = document.getElementsByTagName('body')[0];
 var googleReviewsSet = '';
 var yelpReviewsSet = '';
 
+var panorama;
+
 // Enable Search button only after user's geolocation is fetched
 $.ajax({url: "http://ip-api.com/json", success: function(result){
     jsonObj = JSON.parse(JSON.stringify(result));
@@ -313,7 +315,6 @@ function processTableRowClick(ev){
                 heading: 265,
                 pitch: 0
             }));
-            panorama.setVisible(true);
         }
         
         // Checks that the PlacesServiceStatus is OK, and adds a marker
@@ -473,6 +474,8 @@ function processTableRowClick(ev){
                 var mapSubmitButton = document.getElementById('submitMapForm');
                 mapSubmitButton.addEventListener('click',getDirections,false);
 
+                var toggleStreetButton = document.getElementById('streetViewToggle');
+                toggleStreetButton.addEventListener('click',toggleStreetView,false);
             }
         }
         getInfo();
@@ -684,6 +687,21 @@ function getDirections(){
         directionsDisplay.setDirections(response);
         }
     });
+}
 
+function toggleStreetView() {
+    var toggle = panorama.getVisible();
+    var gMapImg = document.getElementById('gMapImg');
+    var pegmanImg = document.getElementById('pegmanImg');
+    if (toggle == false) {
+      panorama.setVisible(true);
+      gMapImg.style.display = 'block';
+      pegmanImg.style.display = 'none';
+    } 
+    else {
+      panorama.setVisible(false);
+      gMapImg.style.display = 'none';
+      pegmanImg.style.display = 'block';
+    }
 }
     

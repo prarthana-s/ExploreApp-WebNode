@@ -44,3 +44,15 @@ img.placeIcon {
 #mapContainer {
     height: 300px;
 }
+
+#gMapImg {
+    display: none;
+}
+
+.streetViewIcon {
+    height: 30px;
+    width: 30px;
+    border: solid .08em #eee;
+    border-radius: .1em;
+    margin: .25em .25em .25em;
+}

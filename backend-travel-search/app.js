@@ -68,14 +68,11 @@ app.get('/nearbyPlaces', function(req, res) {
     }
 
     let url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lon}&radius=${radius}&type=${type}&keyword=${keyword}&key=${googleKey}`;
-    console.log(url);
     request(url, function (err, response, body) {
         if(err){
             console.log('error:', error);
         } else {
-            // console.log('body:', body);
             body = JSON.parse(body);
-            // console.log(body);
             res.send(body);
         }
     });
@@ -89,17 +86,14 @@ app.get('/nextPage', function(req, res) {
     let query = req.query;
     
     let nextPageToken = encodeURIComponent(query.nextPageToken);
-    // let nextPageToken = 'CrQCLQEAAEAIDJjxnTa0U4PoEGUePN1i1_658Ljju0qOFDc-nbn71Xhm-cRRbQDZmuqi597p0LnnWd_mtB0VFsFcfgUUOZtP4UQAXhqfxB-Nx4xwWFdr2vuCRehQ3XdolewC-POfDMb2IYE3rM5t_VfBfjeayMJrM6H01lPeWRjnvMH78aHb__Bwy4M1WjiHF4-zZrpdX71V_5QFEHou1BA4TO93T57Wp22-41J2KAA6wqTEplMHEuxGJdiGcYNmQwl_ss5UV7E1KUaw3BSbG0dzehxsecD7kMUSKi60rvwG-6tLMbGPKaKLjJZJeuAslA7WWxyprkdAXJK5AanncxtkL9KxBVxSv6P-Fq5S1lw_kGuQvfFF7AovURbyiqzTBZPZZIGw2RaVlgYnTolnL_YSr913KhASEPAh73OMu1Qmv_Zl6uFiphQaFBUua7PSchLd9mSS9Zo4_4VKdJMI';
-    
+
     let url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?pagetoken=${nextPageToken}&key=${googleKey}`
 
     request(url, function (err, response, body) {
         if(err){
             console.log('error:', error);
         } else {
-            console.log('body:', body);
             body = JSON.parse(body);
-            console.log(body);
             res.send(body);
         }
     });
@@ -108,8 +102,17 @@ app.get('/nextPage', function(req, res) {
 
 
 app.get('/yelpReviews', function(req, res) {
-    
+
     'use strict';
+
+    let query = req.query;
+    
+    let placeName = encodeURIComponent(query.name);
+    let placeAddress1 = encodeURIComponent(query.address1);
+    let placeCity = encodeURIComponent(query.city);
+    let placeState = encodeURIComponent(query.state);
+    let placeCountry = encodeURIComponent(query.country);
+    let placePostalCode = encodeURIComponent(query.postal_code);
     
     const yelp = require('yelp-fusion');
     
@@ -118,18 +121,21 @@ app.get('/yelpReviews', function(req, res) {
     // Check if business best match API call returns any result
     // matchType can be 'lookup' or 'best'
     client.businessMatch('best', {
-        name: 'Pan',
-        address1: '510 N Coast Hwy 101',
-        address2: 'Encinitas, CA 92024',
-        city: 'Encinitas',
-        state: 'CA',
-        country: 'US'
+        name: placeName,
+        address1: placeAddress1,
+        city: placeCity,
+        state: placeState,
+        country: placeCountry,
+        postal_code: placePostalCode
     }).then(response => {
+        console.log(response);
         if (response.jsonBody.businesses.length != 0) {
 
             let id = response.jsonBody.businesses[0].id;
             client.reviews(id).then(response => {
-                console.log(response.jsonBody.reviews[0].text);
+                console.log(response);
+                res.send(response.jsonBody.reviews);
+                // console.log(response.jsonBody.reviews[0].text);
             }).catch(e => {
                 console.log(e);
             });

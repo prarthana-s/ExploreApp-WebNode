@@ -5,6 +5,9 @@ var fullUrl = script.src;
 
 var bodyElement = document.getElementsByTagName('body')[0];
 
+var googleReviewsSet = '';
+var yelpReviewsSet = '';
+
 // Enable Search button only after user's geolocation is fetched
 $.ajax({url: "http://ip-api.com/json", success: function(result){
     jsonObj = JSON.parse(JSON.stringify(result));
@@ -297,6 +300,8 @@ function processTableRowClick(ev){
         function callback(results, status) {
             if (status == google.maps.places.PlacesServiceStatus.OK) {
 
+                console.log(results);
+
                 // Info tab 
 
                 var info = {};
@@ -393,33 +398,178 @@ function processTableRowClick(ev){
 
 
                 // Google Reviews
-                var googleReviews = results.reviews;
+                googleReviews = results.reviews;
                 if (googleReviews) {
-                    var reviewsHTML = '';
-
-                    for (let i = 0 ; i < googleReviews.length; i++) {
-                        var timestamp = moment(moment.unix(googleReviews[i].time)._d).format("YYYY-MM-DD HH:mm:ss");
-                        reviewsHTML += '<div class="card"><div class="card-body"> \
-                            <a target="_blank" href="' + googleReviews[i].author_url + '"><img class="authorPic" src="' + googleReviews[i].profile_photo_url + '"/></a>\
-                            <a target="_blank" href="' + googleReviews[i].author_url + '"><p class="card-text author-name authorName">' + googleReviews[i].author_name + '</p></a>';
-
-                        for (let j = 0 ; j < googleReviews[i].rating; j++) {
-                            reviewsHTML += '<i class="fas fa-star rating"></i>';
-                        }
-                            
-                        reviewsHTML += '<span class="card-text text-muted time-stamp">' + timestamp + '</span>' + 
-                            '<p class="card-text review-text">' + googleReviews[i].text + '</p></div></div>';
-                    }
-
-                    var reviewsContainer = document.getElementById('reviewsContainer');
-                    reviewsContainer.innerHTML = reviewsHTML;
+                    generateGoogleReviews(googleReviews,1);
                 }
+
+
+                // Yelp Reviews
+                let yelpParams = {};
+                yelpParams['name'] = results.name;
+
+                for (let i =0 ; i < results.address_components.length ; i++) {
+                    if (results.address_components[i].types.includes('route')){
+                        yelpParams['address1'] = results.address_components[i].short_name; 
+                    }
+                    else if (results.address_components[i].types.includes('locality')){
+                        yelpParams['city'] = results.address_components[i].short_name ;
+                    }
+                    else if (results.address_components[i].types.includes('administrative_area_level_1')){
+                        yelpParams['state'] = results.address_components[i].short_name ;
+                    }
+                    else if (results.address_components[i].types.includes('country')){
+                        yelpParams['country'] = results.address_components[i].short_name; 
+                    }
+                    else if (results.address_components[i].types.includes('postal_code')){
+                        yelpParams['postal_code'] = results.address_components[i].short_name; 
+                    }
+                }
+
+
+                $.ajax({
+                    method: "GET",
+                    url: "http://localhost:3000/yelpReviews",
+                    crossDomain: true,
+                    data: yelpParams
+                    })
+                    .done(function( yelpReviews ) {
+                        if(yelpReviews.length) {
+                            generateYelpReviews(yelpReviews,1);
+                        }
+                });
 
             }
         }
-        
         getInfo();
+    }
+}
 
+function generateYelpReviews(yelpReviews, originalResult=0) {
+    if (originalResult){
+        yelpReviewsSet = JSON.parse(JSON.stringify(yelpReviews));
+    }
+
+    var yelpReviewsHTML = '';
+
+    for (let i = 0 ; i < yelpReviews.length; i++) {
+        yelpReviewsHTML += '<div class="card"><div class="card-body"> \
+            <a target="_blank" href="' + yelpReviews[i].url + '"><img class="authorPic" src="' + yelpReviews[i].user.image_url + '"/></a>\
+            <a target="_blank" href="' + yelpReviews[i].url + '"><p class="card-text author-name authorName">' + yelpReviews[i].user.name + '</p></a>';
+
+        for (let j = 0 ; j < yelpReviews[i].rating; j++) {
+            yelpReviewsHTML += '<i class="fas fa-star rating"></i>';
+        }
+            
+        yelpReviewsHTML += '<span class="card-text text-muted time-stamp">' + yelpReviews[i].time_created + '</span>' + 
+            '<p class="card-text review-text">' + yelpReviews[i].text + '</p></div></div>';
+    }
+
+    var yelpReviewsContainer = document.getElementById('yelpReviews');
+    yelpReviewsContainer.innerHTML = yelpReviewsHTML;
+}
+
+function generateGoogleReviews(googleReviews, originalResult=0) {
+
+    if (originalResult){
+        googleReviewsSet = JSON.parse(JSON.stringify(googleReviews));
+    }
+
+    var googleReviewsHTML = '';
+
+    for (let i = 0 ; i < googleReviews.length; i++) {
+        var timestamp = moment(moment.unix(googleReviews[i].time)._d).format("YYYY-MM-DD HH:mm:ss");
+        googleReviewsHTML += '<div class="card"><div class="card-body"> \
+            <a target="_blank" href="' + googleReviews[i].author_url + '"><img class="authorPic" src="' + googleReviews[i].profile_photo_url + '"/></a>\
+            <a target="_blank" href="' + googleReviews[i].author_url + '"><p class="card-text author-name authorName">' + googleReviews[i].author_name + '</p></a>';
+
+        for (let j = 0 ; j < googleReviews[i].rating; j++) {
+            googleReviewsHTML += '<i class="fas fa-star rating"></i>';
+        }
+            
+        googleReviewsHTML += '<span class="card-text text-muted time-stamp">' + timestamp + '</span>' + 
+            '<p class="card-text review-text">' + googleReviews[i].text + '</p></div></div>';
+    }
+
+    var googleReviewsContainer = document.getElementById('googleReviews');
+    googleReviewsContainer.innerHTML = googleReviewsHTML;
+}
+
+// Dynamic sorting
+function compareValues(key, order='asc') {
+    return function(a, b) {
+        if(!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) {
+        // property doesn't exist on either object
+            return 0; 
+        }
+
+        const varA = (typeof a[key] === 'string') ? 
+        a[key].toUpperCase() : a[key];
+        const varB = (typeof b[key] === 'string') ? 
+        b[key].toUpperCase() : b[key];
+
+        let comparison = 0;
+        if (varA > varB) {
+        comparison = 1;
+        } else if (varA < varB) {
+        comparison = -1;
+        }
+        return (
+        (order == 'desc') ? (comparison * -1) : comparison
+        );
+    };
+}
+
+var dropdownButtons = document.getElementById('dropdownButtons');
+dropdownButtons.addEventListener('click',dropdownAction,false);
+
+function dropdownAction(ev) {
+    // Toggle Reviews
+
+    // TODO: Check if already being displayed
+    // Page rescrolls to top, FIX THIS
+    if (ev.target.parentNode.id == 'reviewsToggle') {
+        if (ev.target.id == 'yelpReviewsButton') {
+            document.getElementById('yelpReviews').removeAttribute("hidden");;
+            document.getElementById('googleReviews').setAttribute("hidden","hidden");            
+        }
+        else if (ev.target.id == 'googleReviewsButton') {
+            document.getElementById('yelpReviews').setAttribute("hidden","hidden");
+            document.getElementById('googleReviews').removeAttribute("hidden");            
+        }
+    }
+
+    // Sort reviews
+    else if (ev.target.parentNode.id == 'reviewsSort') {
+        console.log(yelpReviewsSet);
+        if(ev.target.id == 'defaultOrderSort') {
+            generateYelpReviews(yelpReviewsSet,0);
+            generateGoogleReviews(googleReviewsSet,0);
+        }
+        else if(ev.target.id == 'highestRatingSort') {
+            let tempYelpReviews = JSON.parse(JSON.stringify(yelpReviewsSet));
+            tempYelpReviews.sort(compareValues('rating', 'desc'));
+            generateYelpReviews(tempYelpReviews,0);
+
+            let tempGoogleReviews = JSON.parse(JSON.stringify(googleReviewsSet));
+            tempGoogleReviews.sort(compareValues('rating', 'desc'));
+            generateGoogleReviews(tempGoogleReviews,0);
+        }
+        else if(ev.target.id == 'lowestRatingSort') {
+            let tempYelpReviews = JSON.parse(JSON.stringify(yelpReviewsSet));
+            tempYelpReviews.sort(compareValues('rating'));
+            generateYelpReviews(tempYelpReviews,0);
+
+            let tempGoogleReviews = JSON.parse(JSON.stringify(googleReviewsSet));
+            tempGoogleReviews.sort(compareValues('rating'));
+            generateGoogleReviews(tempGoogleReviews,0);
+        }
+        else if(ev.target.id == 'mostRecentSort') {
+            console.log("most recent rating");
+        }
+        else if(ev.target.id == 'leastRecentSort') {
+            console.log("least recent rating");
+        }
     }
 }
     

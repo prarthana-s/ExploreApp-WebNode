@@ -35,3 +35,8 @@ img.placeIcon {
 .authorName {
     font-weight: bold;
 }
+
+.authorPic {
+    height: 50px;
+    width: 50px
+}

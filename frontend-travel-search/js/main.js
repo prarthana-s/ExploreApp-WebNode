@@ -26,6 +26,9 @@ var autocompleteFlag = false;
 function initAutocomplete() {
     autocomplete = new google.maps.places.Autocomplete(document.getElementById('locationInputText'));
     autocomplete.addListener('place_changed', fillInAddress);
+
+    autocomplete = new google.maps.places.Autocomplete(document.getElementById('fromLocation'));
+    autocomplete.addListener('place_changed', fillInFromLocation);
 }
 initAutocomplete();
 
@@ -279,17 +282,26 @@ function processTableRowClick(ev){
         var tabInterface = document.getElementById('detailsContent');
         tabInterface.style.display = 'block';
 
+        let tableContainer = document.getElementById('tableContainer');
+        tableContainer.style.display = 'none';
+
         var map;
 
         function getInfo() {
+            let locationCoordinates = {lat: parseFloat(lat), lng: parseFloat(lng)}
             map = new google.maps.Map(document.getElementById('mapContainer'), {
-            center: {lat: parseFloat(lat), lng: parseFloat(lng)},
-            zoom: 15
+                center: locationCoordinates,
+                zoom: 14
             });
 
             var request = {
-            placeId: placeID
+                placeId: placeID
             };
+
+            var marker = new google.maps.Marker({
+                position: locationCoordinates,
+                map: map
+            });
             
             service = new google.maps.places.PlacesService(map);
             service.getDetails(request, callback);
@@ -439,6 +451,12 @@ function processTableRowClick(ev){
                         }
                 });
 
+
+                // Map
+                let toFieldValue = results.name + ", " + results.formatted_address;
+                var toField = document.getElementById('toLocation');
+                toField.value = toFieldValue; 
+
             }
         }
         getInfo();
@@ -528,6 +546,7 @@ function dropdownAction(ev) {
 
     // TODO: Check if already being displayed
     // Page rescrolls to top, FIX THIS
+    // Remove hidden and use display:none
     if (ev.target.parentNode.id == 'reviewsToggle') {
         
         let dropdownButton = document.getElementById('dropdownReviews');
@@ -580,11 +599,31 @@ function dropdownAction(ev) {
             dropdownButton.innerHTML = 'Lowest Rating';
         }
         else if(ev.target.id == 'mostRecentSort') {
+            let tempYelpReviews = JSON.parse(JSON.stringify(yelpReviewsSet));
+            tempYelpReviews.sort(compareValues('time_created','desc'));
+            generateYelpReviews(tempYelpReviews,0);
+
+            let tempGoogleReviews = JSON.parse(JSON.stringify(googleReviewsSet));
+            tempGoogleReviews.sort(compareValues('time','desc'));
+            generateGoogleReviews(tempGoogleReviews,0);
+
             dropdownButton.innerHTML = 'Most Recent';
         }
         else if(ev.target.id == 'leastRecentSort') {
+            let tempYelpReviews = JSON.parse(JSON.stringify(yelpReviewsSet));
+            tempYelpReviews.sort(compareValues('time_created'));
+            generateYelpReviews(tempYelpReviews,0);
+
+            let tempGoogleReviews = JSON.parse(JSON.stringify(googleReviewsSet));
+            tempGoogleReviews.sort(compareValues('time'));
+            generateGoogleReviews(tempGoogleReviews,0);
+
             dropdownButton.innerHTML = 'Least Recent';
         }
     }
+}
+
+function fillInFromLocation() {
+    var place = autocomplete.getPlace();
 }
     

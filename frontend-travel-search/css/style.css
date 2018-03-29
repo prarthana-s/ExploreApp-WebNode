@@ -40,3 +40,7 @@ img.placeIcon {
     height: 50px;
     width: 50px
 }
+
+#mapContainer {
+    height: 300px;
+}

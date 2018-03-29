@@ -165,6 +165,36 @@
             </div>
 
             <div class="tab-pane fade" id="map" role="tabpanel" aria-labelledby="map-tab">
+            
+                <form>
+                    <div class="form-row">
+
+                        <div class="form-group col-sm-12 col-md-4">
+                            <label for="fromLocation">From</label>
+                            <input type="text" class="form-control" id="fromLocation">
+                        </div>
+
+                        <div class="form-group col-sm-12 col-md-4">
+                            <label for="toLocation">To</label>
+                            <input type="text" class="form-control" id="toLocation" readonly>
+                        </div>
+
+                        <div class="form-group col-sm-12 col-md-2">
+                            <label for="travelMode">Travel Mode</label>
+                            <select id="travelMode" class="form-control">
+                                <option value="driving" selected>Driving</option>
+                                <option value="bicycling">Bicycling</option>
+                                <option value="transit">Transit</option>
+                                <option value="walking">Walking</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-sm-4 col-md-2">
+                            <button type="submit" class="btn btn-primary">Get Directions</button>
+                        </div>
+                    </div>                    
+                </form>
+
                 <div id="mapContainer">
                 </div>
             </div>

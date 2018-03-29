@@ -288,10 +288,11 @@ function processTableRowClick(ev){
         var map;
 
         function getInfo() {
-            let locationCoordinates = {lat: parseFloat(lat), lng: parseFloat(lng)}
+            let locationCoordinates = {lat: parseFloat(lat), lng: parseFloat(lng)};
             map = new google.maps.Map(document.getElementById('mapContainer'), {
                 center: locationCoordinates,
-                zoom: 14
+                zoom: 14,
+                streetViewControl: false
             });
 
             var request = {
@@ -305,6 +306,14 @@ function processTableRowClick(ev){
             
             service = new google.maps.places.PlacesService(map);
             service.getDetails(request, callback);
+
+            panorama = map.getStreetView();
+            panorama.setPosition(locationCoordinates);
+            panorama.setPov(/** @type {google.maps.StreetViewPov} */({
+                heading: 265,
+                pitch: 0
+            }));
+            panorama.setVisible(true);
         }
         
         // Checks that the PlacesServiceStatus is OK, and adds a marker

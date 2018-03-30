@@ -41,6 +41,11 @@ img.placeIcon {
     width: 50px
 }
 
+#twitterButton {
+    height: 30px;
+    width: 30px;
+}
+
 #mapContainer {
     height: 300px;
 }
@@ -55,4 +60,8 @@ img.placeIcon {
     border: solid .08em #eee;
     border-radius: .1em;
     margin: .25em .25em .25em;
+}
+
+#backToList {
+    vertical-align: center;
 }

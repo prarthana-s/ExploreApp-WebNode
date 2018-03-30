@@ -348,7 +348,7 @@ function processTableRowClick(ev){
                     info['Google Page'] = '<a target="_blank" href="' + results.url + '">' + results.url + '</a>';
                 }
 
-                if (results.rating) {
+                if (results.website) {
                     info['Website'] = '<a target="_blank" href="' + results.website + '">' + results.website + '</a>';
                 }
 
@@ -476,6 +476,14 @@ function processTableRowClick(ev){
 
                 var toggleStreetButton = document.getElementById('streetViewToggle');
                 toggleStreetButton.addEventListener('click',toggleStreetView,false);
+
+
+                // Tweet button
+                var tweetButton = document.getElementById('tweet');
+
+                var text = 'Check out ' + results.name + ' located at ' + results.formatted_address + '. Website: ' + (results.website ? results.website : results.url);
+                
+                tweetButton.href = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&hashtags=TravelAndEntertainmentSearch'  ;
             }
         }
         getInfo();

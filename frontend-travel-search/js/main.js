@@ -10,6 +10,10 @@ var yelpReviewsSet = '';
 
 var panorama;
 
+var results;
+
+var favIndex = 1;
+
 // Enable Search button only after user's geolocation is fetched
 $.ajax({url: "http://ip-api.com/json", success: function(result){
     jsonObj = JSON.parse(JSON.stringify(result));
@@ -148,7 +152,7 @@ function constructResultsTable(result, tracker) {
     if (jsonObj) {
         jsonObj = JSON.parse(jsonObj);
         var nextPageToken = jsonObj.next_page_token;
-        var results = jsonObj.results;
+        results = jsonObj.results;
         var myLat = jsonObj.lat;
         var myLon = jsonObj.lon;
 
@@ -191,7 +195,7 @@ function constructResultsTable(result, tracker) {
                 '<td><img class="placeIcon" src="' + icon + '" alt="user image"/></td>' + 
                 '<td class="placeName" data-placeid="' + placeID + '">' + name + '</td>' +
                 '<td class="addressInfo">' + address + '</td>' + 
-                '<td class="favIcon"><i class="far fa-star fa-1x fa-pull-left fa-border fav"></i></td>' + 
+                '<td class="favIcon" data-index="' + i + '" data-placeID="' + placeID + '"><i class="far fa-star fa-1x fa-pull-left fa-border fav"></i></td>' + 
                 '<td class="detailsIcon" data-lat="' + lat + '" data-lng="' + lng + '" data-placeID="' + placeID +
                 '"><i class="fas fa-chevron-right fa-1x fa-pull-left fa-border"></i></td></tr>';
             }
@@ -488,6 +492,61 @@ function processTableRowClick(ev){
         }
         getInfo();
     }
+    else if (target.className == 'favIcon') {
+
+        let index = target.dataset.index;
+        let placeID = target.dataset.placeid;
+
+        let starElem = target.childNodes[0];
+
+        // Obtain local storage contents
+        let favsArray = localStorage.getItem("favs");
+
+        // Check if executing unfavourite
+        if (starElem.classList.contains("filledStar")) {
+
+            // Replace filled star by empty star
+            starElem.classList.remove("filledStar");
+            starElem.classList.remove("fas");
+            starElem.classList.add("far");
+
+            // Find place object in array and remove
+            currentFavsArray = JSON.parse(favsArray);
+            for (let i = 0 ; i < currentFavsArray.length; i++) {
+                if (placeID in currentFavsArray[i]) {
+                    currentFavsArray.splice(i, 1);
+                    break;
+                }
+            }
+
+            // Rewrite updated array to local storage
+            localStorage.setItem("favs", JSON.stringify(currentFavsArray));
+        }
+
+        // Executing add to favourites
+        else {
+
+            // Replace empty star by filled star
+            starElem.classList.add("filledStar");
+            starElem.classList.remove("far");
+            starElem.classList.add("fas");
+
+            // If local storage hasn't been initialized, if none exists
+            if (!favsArray) {
+                var newFavsArray = [];
+                newFavsArray.push({ [placeID] : results[index]});
+                localStorage.setItem("favs", JSON.stringify(newFavsArray));
+            }
+
+            // Add new place to favourites list
+            else {
+                currentFavsArray = JSON.parse(favsArray);
+                currentFavsArray.push({ [placeID] : results[index]});
+                localStorage.setItem("favs", JSON.stringify(currentFavsArray));
+            }
+        }
+
+    }
 }
 
 function generateYelpReviews(yelpReviews, originalResult=0) {
@@ -503,7 +562,7 @@ function generateYelpReviews(yelpReviews, originalResult=0) {
             <a target="_blank" href="' + yelpReviews[i].url + '"><p class="card-text author-name authorName">' + yelpReviews[i].user.name + '</p></a>';
 
         for (let j = 0 ; j < yelpReviews[i].rating; j++) {
-            yelpReviewsHTML += '<i class="fas fa-star rating"></i>';
+            yelpReviewsHTML += '<i class="fas fa-star filledStar"></i>';
         }
             
         yelpReviewsHTML += '<span class="card-text text-muted time-stamp">' + yelpReviews[i].time_created + '</span>' + 
@@ -529,7 +588,7 @@ function generateGoogleReviews(googleReviews, originalResult=0) {
             <a target="_blank" href="' + googleReviews[i].author_url + '"><p class="card-text author-name authorName">' + googleReviews[i].author_name + '</p></a>';
 
         for (let j = 0 ; j < googleReviews[i].rating; j++) {
-            googleReviewsHTML += '<i class="fas fa-star rating"></i>';
+            googleReviewsHTML += '<i class="fas fa-star filledStar"></i>';
         }
             
         googleReviewsHTML += '<span class="card-text text-muted time-stamp">' + timestamp + '</span>' + 

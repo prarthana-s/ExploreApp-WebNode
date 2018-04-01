@@ -30,11 +30,11 @@ $.ajax({url: "http://ip-api.com/json", success: function(result){
 var autocompleteFlag = false;
 
 function initAutocomplete() {
-    autocomplete = new google.maps.places.Autocomplete(document.getElementById('locationInputText'));
-    autocomplete.addListener('place_changed', fillInAddress);
-
     autocomplete = new google.maps.places.Autocomplete(document.getElementById('fromLocation'));
     autocomplete.addListener('place_changed', fillInFromLocation);
+
+    autocomplete = new google.maps.places.Autocomplete(document.getElementById('locationInputText'));
+    autocomplete.addListener('place_changed', fillInAddress);
 }
 initAutocomplete();
 
@@ -170,7 +170,7 @@ function constructResultsTable(result, tracker) {
         }
 
         if (!results.length) {
-            tableHTML = '<div id="noRecordsFound">No records have been found.</div';
+            tableHTML = '<div class="alert alert-warning" role="alert">No records.</div>';
         }
 
         else {
@@ -418,7 +418,7 @@ function processTableRowClick(ev){
                 // No photos
                 else {
                     var photosContainer = document.getElementById('photosDisplay');
-                    var photosHTML = '';
+                    var photosHTML = '<div class="alert alert-warning" role="alert">No records.</div>';
                     photosContainer.innerHTML = photosHTML;
                 }
 
@@ -427,6 +427,10 @@ function processTableRowClick(ev){
                 googleReviews = results.reviews;
                 if (googleReviews) {
                     generateGoogleReviews(googleReviews,1);
+                }
+                else {
+                    var googleReviewsContainer = document.getElementById('googleReviews');
+                    googleReviewsContainer.innerHTML = '<div class="alert alert-warning" role="alert">No records.</div>';
                 }
 
 
@@ -462,6 +466,10 @@ function processTableRowClick(ev){
                     .done(function( yelpReviews ) {
                         if(yelpReviews.length) {
                             generateYelpReviews(yelpReviews,1);
+                        }
+                        else {
+                            var yelpReviewsContainer = document.getElementById('yelpReviews');
+                            yelpReviewsContainer.innerHTML = '<div class="alert alert-warning" role="alert">No records.</div>';
                         }
                 });
 
@@ -546,6 +554,27 @@ function processTableRowClick(ev){
             }
         }
 
+    }
+    else if (target.className == 'delIcon') { 
+
+        let placeID = target.dataset.placeid;
+
+        // Obtain local storage contents
+        let favsArray = localStorage.getItem("favs");
+
+        // Find place object in array and remove
+        currentFavsArray = JSON.parse(favsArray);
+        for (let i = 0 ; i < currentFavsArray.length; i++) {
+            if (placeID in currentFavsArray[i]) {
+                currentFavsArray.splice(i, 1);
+                break;
+            }
+        }
+
+        // Rewrite updated array to local storage
+        localStorage.setItem("favs", JSON.stringify(currentFavsArray));
+
+        $('#pills-favorites').tab('show');
     }
 }
 
@@ -769,6 +798,64 @@ function toggleStreetView() {
       panorama.setVisible(false);
       gMapImg.style.display = 'none';
       pegmanImg.style.display = 'block';
+    }
+}
+
+$('a[data-toggle="pill"]').on('show.bs.tab', function (e) {
+    if (e.target.id == 'pills-favorites-tab' ) {
+        generateFavsTable();
+    }
+})
+
+function generateFavsTable() {
+    let favsTab = document.getElementById('pills-favorites');
+    let favsInnerHTML = '';
+    if ("favs" in localStorage) {
+        let favItems = JSON.parse(localStorage["favs"]);
+
+        if (favItems.length) {
+            favsInnerHTML = '<div class="table-responsive" id="favTableContainer">' + 
+            '<table class="table table-hover table-sm" id="favsTable">' + 
+            '<tr><th scope="col">#</th>' + 
+            '<th scope="col">Category</th>' + 
+            '<th scope="col">Name</th>' + 
+            '<th scope="col">Address</th>' + 
+            '<th scope="col">Favorite</th>' + 
+            '<th scope="col">Details</th></tr>';
+
+            for (let i = 0 ; i < favItems.length; i++) {  
+                let favItem = (Object.values(favItems[i])[0]);              
+                let icon = favItem.icon;
+                let name = favItem.name;
+                let address = favItem.vicinity;
+                let placeID = favItem.place_id;
+                let lat = favItem.geometry.location.lat;
+                let lng = favItem.geometry.location.lng;
+
+                favsInnerHTML += '<tr><th scope="row">' + (parseInt(i)+1) + '</th>' +
+                '<td><img class="placeIcon" src="' + icon + '" alt="user image"/></td>' + 
+                '<td class="placeName" data-placeid="' + placeID + '">' + name + '</td>' +
+                '<td class="addressInfo">' + address + '</td>' + 
+                '<td class="delIcon" data-index="' + i + '" data-placeID="' + placeID + '"><i class="fas fa-trash-alt fa-1x fa-pull-left fa-border fav"></i></td>' + 
+                '<td class="detailsIcon" data-lat="' + lat + '" data-lng="' + lng + '" data-placeID="' + placeID +
+                '"><i class="fas fa-chevron-right fa-1x fa-pull-left fa-border"></i></td></tr>';
+            }
+            favsInnerHTML += '</table></div>';
+        }
+        else {
+            favsInnerHTML = '<div class="alert alert-warning" role="alert">No records.</div>';
+        }
+
+    }
+    else {
+        favsInnerHTML = '<div class="alert alert-warning" role="alert">No records.</div>';
+    }
+
+    favsTab.innerHTML = favsInnerHTML;
+
+    var favsTable = document.getElementById('favsTable');
+    if (favsTable) {
+        favsTable.addEventListener('click',processTableRowClick,false);
     }
 }
     

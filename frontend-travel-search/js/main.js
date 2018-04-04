@@ -106,6 +106,9 @@ function submitForm() {
         var lat = formElems.namedItem("hereLatitude").value;
         var lon = formElems.namedItem("hereLongitude").value;
 
+        // Show progress bar
+        document.getElementById('progressBar').removeAttribute("hidden");
+
         if (!autocompleteFlag && formElems.namedItem("locationRadio").value == 'location') {
             $.ajax({
                 method: "GET",
@@ -199,7 +202,7 @@ function constructResultsTable(result, tracker) {
                 '<td class="detailsIcon" data-lat="' + lat + '" data-lng="' + lng + '" data-placeID="' + placeID +
                 '"><i class="fas fa-chevron-right fa-1x fa-pull-left fa-border"></i></td></tr>';
             }
-            tableHTML += '</table></div>';
+            tableHTML += '</table>';
         }
 
         // if (prevPageFlag) {
@@ -208,8 +211,11 @@ function constructResultsTable(result, tracker) {
         // }
 
         if (nextPageToken && nextPageToken.length) {
-            tableHTML += '<button type="button" id="nextButton" class="btn btn-outline-dark" data-token="' + nextPageToken + '">Next</button>';
+            tableHTML += '<button type="button" id="nextButton" class="btn btn-outline-dark" data-token="' + nextPageToken + '">Next</button></div>';
         }
+
+        // Hide progress bar
+        document.getElementById('progressBar').setAttribute("hidden","hidden"); 
 
         var tableContainer =  document.getElementById('pills-results');
         tableContainer.innerHTML = tableHTML;
@@ -241,6 +247,10 @@ function generateHTML(address, placeID, lat, lng) {
 
 function displayNextResults(ev) {
     var nextPageToken = ev.target.dataset.token;
+
+    // Show progress bar
+    document.getElementById('progressBar').removeAttribute("hidden");
+
     $.ajax({
         method: "GET",
         url: "http://localhost:3000/nextPage",
@@ -284,11 +294,8 @@ function processTableRowClick(ev){
         var lng = target.dataset.lng;
         var placeID = target.dataset.placeid;
 
-        var tabInterface = document.getElementById('detailsContent');
-        tabInterface.style.display = 'block';
-
-        let tableContainer = document.getElementById('tableContainer');
-        tableContainer.style.display = 'none';
+        // Show progress bar
+        document.getElementById('progressBar').removeAttribute("hidden");
 
         var map;
 
@@ -498,6 +505,15 @@ function processTableRowClick(ev){
             }
         }
         getInfo();
+
+        let tableContainer = document.getElementById('tableContainer');
+        tableContainer.style.display = 'none';
+
+        // Hide progress bar
+        document.getElementById('progressBar').setAttribute("hidden","hidden"); 
+        
+        var tabInterface = document.getElementById('detailsContent');
+        tabInterface.style.display = 'block';
     }
     else if (target.className == 'favIcon') {
 
@@ -573,7 +589,14 @@ function processTableRowClick(ev){
         // Rewrite updated array to local storage
         localStorage.setItem("favs", JSON.stringify(currentFavsArray));
 
-        $('#pills-favorites').tab('show');
+        // $('#pills-favorites').tab('show');
+        // $(function () {
+        //     $('#pills-results-tab').tab('show');
+        // })
+
+        $(function () {
+            $('#pills-favorites-tab').tab('show');
+        })
     }
 }
 

@@ -213,7 +213,6 @@ function constructResultsTable(result, tracker) {
 
         var tableContainer =  document.getElementById('pills-results');
         tableContainer.innerHTML = tableHTML;
-        bodyElement.appendChild(tableContainer);
 
         var placesTable = document.getElementById('placesTable');
         if (placesTable) {

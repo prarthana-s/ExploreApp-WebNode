@@ -29,6 +29,10 @@ $.ajax({url: "http://ip-api.com/json", success: function(result){
 
 var autocompleteFlag = false;
 
+var listButton = document.getElementById('backToList');
+listButton.addEventListener('click',goBackToList,false);
+
+
 function initAutocomplete() {
     autocomplete = new google.maps.places.Autocomplete(document.getElementById('fromLocation'));
     autocomplete.addListener('place_changed', fillInFromLocation);
@@ -158,6 +162,8 @@ function constructResultsTable(result, tracker) {
         results = jsonObj.results;
         var myLat = jsonObj.lat;
         var myLon = jsonObj.lon;
+        var tableHTML = '';
+        var favsArray = null;
 
         // if (tracker) {
         //     prevPageFlag = 1;
@@ -177,14 +183,20 @@ function constructResultsTable(result, tracker) {
         }
 
         else {
-            tableHTML = '<div class="table-responsive" id="tableContainer">' + 
-            '<table class="table table-hover table-sm" id="placesTable" data-myLat="' + myLat + '" data-myLon="' + myLon + '">' + 
+            tableHTML += '<div class="table-responsive" id="tableContainer">';
+            tableHTML += '<button type="button" id="detailsButton" class="btn btn-outline-dark float-right" disabled>Details<i class="fas fa-chevron-right fa-1x fa-float-right"></button>';
+            tableHTML += '<table class="table table-hover table-sm" id="placesTable" data-myLat="' + myLat + '" data-myLon="' + myLon + '">' + 
             '<tr><th scope="col">#</th>' + 
             '<th scope="col">Category</th>' + 
             '<th scope="col">Name</th>' + 
             '<th scope="col">Address</th>' + 
             '<th scope="col">Favorite</th>' + 
             '<th scope="col">Details</th></tr>';
+
+            // Add filled star styling to already existing favorites in places table
+            if ("favs" in localStorage) {
+                favsArray = localStorage.getItem("favs");
+            }
 
             for (let i=0; i<results.length; i++) {
                 var icon = results[i].icon;
@@ -193,17 +205,34 @@ function constructResultsTable(result, tracker) {
                 var placeID = results[i].place_id;
                 var lat = results[i].geometry.location.lat;
                 var lng = results[i].geometry.location.lng;
+                var isFavItem = false;
 
-                tableHTML += '<tr><th scope="row">' + (parseInt(i)+1) + '</th>' +
+                tableHTML += '<tr id="tr_' + placeID + '"><th scope="row">' + (parseInt(i)+1) + '</th>' +
                 '<td><img class="placeIcon" src="' + icon + '" alt="user image"/></td>' + 
                 '<td class="placeName" data-placeid="' + placeID + '">' + name + '</td>' +
-                '<td class="addressInfo">' + address + '</td>' + 
-                '<td class="favIcon" data-index="' + i + '" data-placeID="' + placeID + '"><i class="far fa-star fa-1x fa-pull-left fa-border fav"></i></td>' + 
-                '<td class="detailsIcon" data-lat="' + lat + '" data-lng="' + lng + '" data-placeID="' + placeID +
-                '"><i class="fas fa-chevron-right fa-1x fa-pull-left fa-border"></i></td></tr>';
+                '<td class="addressInfo">' + address + '</td>';
+
+                if (favsArray) {
+                    currentFavsArray = JSON.parse(favsArray);
+                    for (let i = 0 ; i < currentFavsArray.length; i++) {
+                        if (placeID in currentFavsArray[i]) {
+                            tableHTML += '<td class="favIcon" data-index="' + i + '" data-placeID="' + placeID + '"><i class="fas fa-star fa-1x fa-pull-left fa-border fav filledStar"></i></td>';                  
+                            isFavItem = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (!isFavItem){
+                    tableHTML +='<td class="favIcon" data-index="' + i + '" data-placeID="' + placeID + '"><i class="far fa-star fa-1x fa-pull-left fa-border fav"></i></td>'; 
+                }
+                tableHTML += '<td class="detailsIcon" data-index="' + i + '" data-lat="' + lat + '" data-lng="' + lng + '" data-placeID="' + placeID +
+                '"><i class="fas fa-chevron-right fa-1x fa-pull-left fa-border detailsArrow"></i></td></tr>';
             }
             tableHTML += '</table>';
         }
+
+
 
         // if (prevPageFlag) {
         //     console.log("show previous button");
@@ -285,6 +314,8 @@ function convertPriceToDollar(price) {
     
 }
 
+var previousSelectedRow = null;
+
 function processTableRowClick(ev){
     let target = ev.target.parentNode;
 
@@ -293,6 +324,19 @@ function processTableRowClick(ev){
         var lat = target.dataset.lat;
         var lng = target.dataset.lng;
         var placeID = target.dataset.placeid;
+        var index = target.dataset.index;
+
+        var rowName = "tr_" + placeID;
+
+        if (previousSelectedRow) {
+            var previousRow = document.getElementById(previousSelectedRow);
+            previousRow.classList.remove("table-warning");
+        }
+
+        previousSelectedRow = rowName;
+
+        var correspondingRow = document.getElementById(rowName);
+        correspondingRow.classList.add("table-warning");
 
         // Show progress bar
         document.getElementById('progressBar').removeAttribute("hidden");
@@ -389,6 +433,10 @@ function processTableRowClick(ev){
                 });
                 infoContainer.innerHTML = infoHTML;
 
+                var infoFavButton = document.getElementsByClassName('infoFavIcon')[0];
+                infoFavButton.dataset.index = index;
+                infoFavButton.dataset.placeID = placeID;
+                infoFavButton.addEventListener('click', processInfoFav,false);
 
                 // Photos
                 if (results.photos) {
@@ -511,11 +559,15 @@ function processTableRowClick(ev){
 
         // Hide progress bar
         document.getElementById('progressBar').setAttribute("hidden","hidden"); 
-        
+
+        let detailsButton = document.getElementById('detailsButton');
+        detailsButton.removeAttribute("disabled");
+
         var tabInterface = document.getElementById('detailsContent');
         tabInterface.style.display = 'block';
+
     }
-    else if (target.className == 'favIcon') {
+    else if (target.className == 'favIcon' || target.className == 'infoFavIcon') {
 
         let index = target.dataset.index;
         let placeID = target.dataset.placeid;
@@ -573,7 +625,7 @@ function processTableRowClick(ev){
     else if (target.className == 'delIcon') { 
 
         let placeID = target.dataset.placeid;
-
+        console.log(placeID);
         // Obtain local storage contents
         let favsArray = localStorage.getItem("favs");
 
@@ -594,10 +646,20 @@ function processTableRowClick(ev){
         //     $('#pills-results-tab').tab('show');
         // })
 
-        $(function () {
-            $('#pills-favorites-tab').tab('show');
-        })
+        // $(function () {
+        //     $('#pills-favorites-tab').tab('show');
+        // })
     }
+}
+
+function goBackToList(ev) {
+    console.log("go back!");
+    let tableContainer = document.getElementById('tableContainer');
+    tableContainer.style.display = 'block';
+
+    let tabInterface = document.getElementById('detailsContent');
+    tabInterface.style.display = 'none';
+
 }
 
 function generateYelpReviews(yelpReviews, originalResult=0) {
@@ -859,15 +921,14 @@ function generateFavsTable() {
                 '<td class="placeName" data-placeid="' + placeID + '">' + name + '</td>' +
                 '<td class="addressInfo">' + address + '</td>' + 
                 '<td class="delIcon" data-index="' + i + '" data-placeID="' + placeID + '"><i class="fas fa-trash-alt fa-1x fa-pull-left fa-border fav"></i></td>' + 
-                '<td class="detailsIcon" data-lat="' + lat + '" data-lng="' + lng + '" data-placeID="' + placeID +
-                '"><i class="fas fa-chevron-right fa-1x fa-pull-left fa-border"></i></td></tr>';
+                '<td class="detailsIcon" data-index="' + i + '" data-lat="' + lat + '" data-lng="' + lng + '" data-placeID="' + placeID +
+                '"><i class="fas fa-chevron-right fa-1x fa-pull-left fa-border detailsArrow"></i></td></tr>';
             }
             favsInnerHTML += '</table></div>';
         }
         else {
             favsInnerHTML = '<div class="alert alert-warning" role="alert">No records.</div>';
         }
-
     }
     else {
         favsInnerHTML = '<div class="alert alert-warning" role="alert">No records.</div>';
@@ -881,3 +942,8 @@ function generateFavsTable() {
     }
 }
     
+function processInfoFav(ev) {
+    // Treat the fav icon click as if clicked in row
+    console.log("fav info clicked!");
+    processTableRowClick(ev);
+}

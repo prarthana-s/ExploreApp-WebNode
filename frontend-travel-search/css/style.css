@@ -17,7 +17,7 @@ img.placeIcon {
     width: 40px;
 }
 
-.fav, .fa-chevron-right {
+.fav, .detailsArrow {
     background-color: white;
     border: solid .08em #eee;
     border-radius: .1em;
@@ -62,6 +62,6 @@ img.placeIcon {
     margin: .25em .25em .25em;
 }
 
-#backToList {
-    vertical-align: center;
+#nextButton, #prevButton {
+    display: none;
 }

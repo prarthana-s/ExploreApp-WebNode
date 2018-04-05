@@ -11,6 +11,8 @@ var yelpReviewsSet = '';
 var panorama;
 
 var results;
+var resultsArr = [];
+var currPageNumber = -1;
 
 var favIndex = 1;
 
@@ -132,6 +134,8 @@ function submitForm() {
         // Show progress bar
         document.getElementById('progressBar').removeAttribute("hidden");
 
+        resultsArr = [];
+
         if (!autocompleteFlag && formElems.namedItem("locationRadio").value == 'location') {
             $.ajax({
                 method: "GET",
@@ -151,6 +155,8 @@ function submitForm() {
                         data: {keyword: formElems.namedItem("keyword").value, category: formElems.namedItem("category").value, distance: formElems.namedItem("distance").value, locationRadio: formElems.namedItem("locationRadio").value, locationInput: formElems.namedItem("locationInput").value, hereLatitude: lat, hereLongitude: lon}
                         })
                         .done(function( result ) {
+                            currPageNumber++;
+                            resultsArr.push(result);
                             constructResultsTable(JSON.stringify(result),0);
                         });
                 });
@@ -164,18 +170,19 @@ function submitForm() {
                 data: {keyword: formElems.namedItem("keyword").value, category: formElems.namedItem("category").value, distance: formElems.namedItem("distance").value, locationRadio: formElems.namedItem("locationRadio").value, locationInput: formElems.namedItem("locationInput").value, hereLatitude: lat, hereLongitude: lon}
                 })
                 .done(function( result ) {
+                    currPageNumber++;
+                    resultsArr.push(result);
                     constructResultsTable(JSON.stringify(result),0);
                 });
         }
     }
 }
 
-// var prevPageFlag;
+var prevPageFlag = false;
 // var prevResult;
 
-function constructResultsTable(result, tracker=0) {
+function constructResultsTable(result, currPageNumber) {
     jsonObj = result;
-    console.log(jsonObj);
 
     if (jsonObj) {
         jsonObj = JSON.parse(jsonObj);
@@ -184,13 +191,12 @@ function constructResultsTable(result, tracker=0) {
         var tableHTML = '';
         var favsArray = null;
 
-        // if (tracker) {
-        //     prevPageFlag = 1;
-        //     prevResult = result;
-        // }
-        // else {
-        //     prevResult = result;
-        // }
+        if (currPageNumber > 0) {
+            prevPageFlag = true;
+        }
+        else {
+            prevPageFlag = false;
+        }
 
         var existingTable = document.getElementById('tableContainer');
         if (existingTable) {
@@ -253,13 +259,12 @@ function constructResultsTable(result, tracker=0) {
 
 
 
-        // if (prevPageFlag) {
-        //     console.log("show previous button");
-        //     tableHTML += '<button type="button" id="prevButton" class="btn btn-outline-dark">Previous</button>';
-        // }
+        if (prevPageFlag) {
+            console.log("show previous button");
+            tableHTML += '<button type="button" id="prevButton" class="btn btn-outline-dark">Previous</button>';
+        }
 
         if (nextPageToken && nextPageToken.length) {
-            console.log("Add button");
             tableHTML += '<button type="button" id="nextButton" class="btn btn-outline-dark" data-token="' + nextPageToken + '">Next</button></div>';
         }
         else {
@@ -282,18 +287,17 @@ function constructResultsTable(result, tracker=0) {
             nextButton.addEventListener('click',displayNextResults,false);
         }
 
+        var prevButton = document.getElementById('prevButton');
+        if (prevButton) {
+            prevButton.addEventListener('click',displayPrevResults,false);
+        }
+
         var detailsButtons = document.getElementsByClassName('detailsButton');
         if(detailsButtons) {
             for (let i = 0 ; i < detailsButtons.length; i++) {
                 detailsButtons[i].style.display = 'block';
             }
         }
-
-        // var prevButton = document.getElementById('prevButton');
-        // if (prevButton) {
-        //     prevButton.addEventListener('click',displayPrevResults,false);
-        // }
-
     }
 }
 
@@ -317,13 +321,16 @@ function displayNextResults(ev) {
         data: {nextPageToken: nextPageToken}
         })
         .done(function( result ) {
-            constructResultsTable(JSON.stringify(result),1);
+            currPageNumber++;
+            resultsArr.push(result);
+            constructResultsTable(JSON.stringify(result),currPageNumber);
         });
 }
 
-// function displayPrevResults(ev) {
-//     // constructResultsTable(JSON.stringify(prevResult),1);
-// }
+function displayPrevResults(ev) {
+    currPageNumber--;
+    constructResultsTable(JSON.stringify(resultsArr[currPageNumber]),currPageNumber);
+}
 
 function convertPriceToDollar(price) {
     if (price >= 0 && price <= 1) {
@@ -342,6 +349,12 @@ function convertPriceToDollar(price) {
         return "$$$$";
     }
     
+}
+
+function arrayRotate(arr, count) {
+    count -= arr.length * Math.floor(count / arr.length)
+    arr.push.apply(arr, arr.splice(0, count))
+    return arr
 }
 
 var previousSelectedRow = null;
@@ -444,21 +457,46 @@ function processTableRowClick(ev){
 
                 // Open Hours Modal Pane
                 var utc_offset = results.urc_offset;
-                console.log(moment().utcOffset(utc_offset));
+                var todayDay = moment.utc(utc_offset).format("dddd");
                 var hours = results.opening_hours;
+                console.log(hours);
                 if (hours) {
-                    var hoursStatus = (hours.open_now == 1 ? "Open now:" : "Closed now:");
                     var dailyOpenModal = '<a href="#" data-toggle="modal" data-target="#exampleModalCenter">Daily Open Hours</a>';
                     var weekdayText = hours.weekday_text;
 
-                    info['Hours'] = (results.open_now == 1 ? "Open Now" : "Closed Now") + " " + dailyOpenModal;
+                    for (let i = 0 ; i < weekdayText.length; i++) {
+                        weekdayText[i] =  (weekdayText[i].split(/:(.+)/));   
+                        weekdayText[i][1] = weekdayText[i][1].trim();              
+                    }
+                    
+                    for(let i = 0 ; i < weekdayText.length; i++) {
+                        if (weekdayText[0][0] != todayDay) {
+                            arrayRotate(weekdayText,1);
+                        }
+                        else {
+                            break;
+                        }
+                    }
 
+                    
                     var openHoursModal = document.getElementById('main_modal_body');
                     var openHoursHTML = '<table class="table"><tbody>';
-    
+                    
                     for (let i = 0 ; i < weekdayText.length ; i++) {
-                        openHoursHTML += '<tr><th scope="row">' + weekdayText[i] + '</th></tr>';
+                        if (i ==0) {
+                            openHoursHTML += '<tr><th scope="row">' + weekdayText[i][0] + '</th><th>' + weekdayText[i][1] + '</th></tr>';
+                            if (hours.open_now) {
+                                info['Hours'] = 'Open now: ' + weekdayText[i][1] + ' ' + dailyOpenModal;
+                            }
+                            else {
+                                info['Hours'] = 'Closed ' + dailyOpenModal;
+                            }
+                        }
+                        else {
+                            openHoursHTML += '<tr><td>' + weekdayText[i][0] + '</td><td>' + weekdayText[i][1] + '</td></tr>';
+                        }
                     };
+                    
                     openHoursHTML += '</tbody></table></div>';
                     openHoursModal.innerHTML = openHoursHTML;
                 }

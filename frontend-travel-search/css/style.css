@@ -62,10 +62,6 @@ img.placeIcon {
     margin: .25em .25em .25em;
 }
 
-#nextButton, #prevButton {
-    display: none;
-}
-
 .row {
     display: flex;
     flex-wrap: wrap;

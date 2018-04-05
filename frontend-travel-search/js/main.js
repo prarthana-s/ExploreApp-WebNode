@@ -154,15 +154,13 @@ function submitForm() {
 // var prevResult;
 
 function constructResultsTable(result, tracker=0) {
-    console.log(results);
     jsonObj = result;
+    console.log(jsonObj);
 
     if (jsonObj) {
         jsonObj = JSON.parse(jsonObj);
         var nextPageToken = jsonObj.next_page_token;
         results = jsonObj.results;
-        var myLat = jsonObj.lat;
-        var myLon = jsonObj.lon;
         var tableHTML = '';
         var favsArray = null;
 
@@ -185,8 +183,8 @@ function constructResultsTable(result, tracker=0) {
 
         else {
             tableHTML += '<div class="table-responsive" id="tableContainer">';
-            tableHTML += '<button type="button" id="detailsButton" class="btn btn-outline-dark float-right" disabled>Details<i class="fas fa-chevron-right fa-1x fa-float-right"></button>';
-            tableHTML += '<table class="table table-hover table-sm" id="placesTable" data-myLat="' + myLat + '" data-myLon="' + myLon + '">' + 
+            tableHTML += '<button type="button" id="detailsButton" class="btn btn-outline-dark float-right" disabled>Details<i class="fas fa-chevron-right fa-1x fa-float-right"></i></button>';
+            tableHTML += '<table class="table table-hover table-sm" id="placesTable">' + 
             '<tr><th scope="col">#</th>' + 
             '<th scope="col">Category</th>' + 
             '<th scope="col">Name</th>' + 
@@ -241,7 +239,11 @@ function constructResultsTable(result, tracker=0) {
         // }
 
         if (nextPageToken && nextPageToken.length) {
+            console.log("Add button");
             tableHTML += '<button type="button" id="nextButton" class="btn btn-outline-dark" data-token="' + nextPageToken + '">Next</button></div>';
+        }
+        else {
+            tableHTML += '</div>';
         }
 
         // Hide progress bar
@@ -399,8 +401,9 @@ function processTableRowClick(ev){
                 }
 
                 if (results.rating) {
-                    info['Rating'] = results.rating;
+                    info['Rating'] = results.rating +'<span id="rateYo"></span>';
                 }
+
 
                 if (results.url) {
                     info['Google Page'] = '<a target="_blank" href="' + results.url + '">' + results.url + '</a>';
@@ -439,6 +442,11 @@ function processTableRowClick(ev){
                     infoHTML += '<tr><th scope="row">' + key + '</th><td>' + info[key] + '</td></tr>';
                 });
                 infoContainer.innerHTML = infoHTML;
+
+                $("#rateYo").rateYo({
+                    rating: parseFloat(results.rating),
+                    starWidth: "15px"
+                });
 
                 var infoFavButton = document.getElementsByClassName('infoFavIcon')[0];
                 infoFavButton.dataset.index = index;
@@ -658,7 +666,6 @@ function processTableRowClick(ev){
 
     }
     else if (target.className == 'delIcon') { 
-
         let placeID = target.dataset.placeid;
         console.log(placeID);
         // Obtain local storage contents
@@ -676,21 +683,11 @@ function processTableRowClick(ev){
         // Rewrite updated array to local storage
         localStorage.setItem("favs", JSON.stringify(currentFavsArray));
 
-        // $(function () {
-        //     // $('#pills-results-tab').tab('show');
-        //     $('#pills-favorites').tab('show');
-        // })
-
-        // $(function () {
-        //     $('#pills-favorites-tab').tab('show');
-        // })
-
-        generateFavsTable();
+        generateFavsTable(0);
     }
 }
 
 function goBackToList(ev) {
-    console.log("go back!");
     let tableContainer = document.getElementById('tableContainer');
     tableContainer.style.display = 'block';
 
@@ -924,7 +921,7 @@ function toggleStreetView() {
 
 $('a[data-toggle="pill"]').on('show.bs.tab', function (e) {
     if (e.target.id == 'pills-favorites-tab' ) {
-        generateFavsTable();
+        generateFavsTable(0);
     }
 
     // Cross verify if favourited items still exist as favorited items
@@ -962,11 +959,14 @@ $('a[data-toggle="pill"]').on('show.bs.tab', function (e) {
     }
 })
 
-function generateFavsTable() {
+function generateFavsTable(startingIndex=0) {
     let favsTab = document.getElementById('pills-favorites');
     let favsInnerHTML = '';
+    let showNextFavButton = false;
+    let showPrevFavButton = false;
     if ("favs" in localStorage) {
         let favItems = JSON.parse(localStorage["favs"]);
+        let length = favItems.length;
 
         if (favItems.length) {
             favsInnerHTML = '<div class="table-responsive" id="favTableContainer">' + 
@@ -978,7 +978,16 @@ function generateFavsTable() {
             '<th scope="col">Favorite</th>' + 
             '<th scope="col">Details</th></tr>';
 
-            for (let i = 0 ; i < favItems.length; i++) {  
+            if (length - startingIndex > 20) {
+                length = startingIndex + 20;
+                showNextFavButton = true;
+            }
+
+            if (startingIndex >= 20) {
+                showPrevFavButton = true;
+            }
+
+            for (let i = startingIndex ; i < length; i++) {  
                 let favItem = (Object.values(favItems[i])[0]);              
                 let icon = favItem.icon;
                 let name = favItem.name;
@@ -1002,7 +1011,16 @@ function generateFavsTable() {
                 '<td class="detailsIcon" data-index="' + i + '" data-lat="' + lat + '" data-lng="' + lng + '" data-placeID="' + placeID +
                 '"><i class="fas fa-chevron-right fa-1x fa-pull-left fa-border detailsArrow"></i></td></tr>';
             }
-            favsInnerHTML += '</table></div>';
+            favsInnerHTML += '</table>';
+
+            if (showPrevFavButton) {
+                favsInnerHTML += '<button type="button" id="prevFavsButton" class="btn btn-outline-dark" data-nextstartindex="' + (startingIndex-20) + '">Previous</button>';
+            }
+            
+            if (showNextFavButton) {
+                favsInnerHTML += '<button type="button" id="nextFavsButton" class="btn btn-outline-dark" data-nextstartindex="' + (startingIndex+20) + '">Next</button>';
+            }
+            favsInnerHTML += '</div>';
         }
         else {
             favsInnerHTML = '<div class="alert alert-warning" role="alert">No records.</div>';
@@ -1014,9 +1032,14 @@ function generateFavsTable() {
 
     favsTab.innerHTML = favsInnerHTML;
 
-    var favsTable = document.getElementById('favsTable');
-    if (favsTable) {
-        favsTable.addEventListener('click',processTableRowClick,false);
+    // var favsTable = document.getElementById('favsTable');
+    // if (favsTable) {
+    //     favsTable.addEventListener('click',processTableRowClick,false);
+    // }
+
+    var favsContainer = document.getElementById('favTableContainer');
+    if (favsContainer) {
+        favsContainer.addEventListener('click',processFavsTableClick,false);
     }
 }
     
@@ -1032,4 +1055,14 @@ function showDetailsPane(ev) {
 
     var tabInterface = document.getElementById('detailsContent');
     tabInterface.style.display = 'block';
+}
+
+function processFavsTableClick(ev) {
+    console.log(ev.target.id);
+    if (ev.target.parentNode.className == 'detailsIcon' || ev.target.parentNode.className == 'delIcon') {
+        processTableRowClick(ev);
+    }
+    else if (ev.target.id == 'nextFavsButton' || ev.target.id == 'prevFavsButton') {
+        generateFavsTable(ev.target.dataset.nextstartindex);
+    }
 }

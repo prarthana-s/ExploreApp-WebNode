@@ -21,11 +21,14 @@ var userCurrLon = null;
 
 var userSelectedLocation = null;
 
+var curLocObtained = false;
+var keywordIsValid = false;
+var locationIsValid = false;
+
 // Enable Search button only after user's geolocation is fetched
 $.ajax({url: "http://ip-api.com/json", success: function(result){
     jsonObj = JSON.parse(JSON.stringify(result));
-    var searchButton = document.getElementById('searchButton');
-    searchButton.removeAttribute('disabled'); 
+    curLocObtained = true;
 
     document.getElementById('hereLatitude').value = jsonObj.lat; 
     document.getElementById('hereLongitude').value = jsonObj.lon; 
@@ -57,7 +60,6 @@ initAutocomplete();
 
 function fillInAddress() {
     var place = autocompleteInSearch.getPlace();
-    console.log(place);
     userSelectedLocation = place.name + ", " + place.formatted_address;
     var formElems = document.getElementById('mainForm').elements;
     autocompleteFlag = true;
@@ -92,8 +94,10 @@ function toggleRequired() {
     if (textInput.hasAttribute('required') !== true) {
         textInput.removeAttribute('disabled');
         textInput.setAttribute('required','required');
+        locationIsValid = false;
+        activateSearchButton();
     }
-
+    
     else {
         textInput.removeAttribute('required');  
     }
@@ -103,6 +107,7 @@ function toggleRequired() {
 function disableTextBox() {
     if (radioSelectionHere.checked) {
         textInput.setAttribute('disabled','disabled');
+        textInput.classList.remove('is-invalid');
         textInput.removeAttribute('required');  
         textInput.value = "";
     }
@@ -1199,5 +1204,90 @@ function processFavsTableClick(ev) {
     }
     else if (ev.target.id == 'nextFavsButton' || ev.target.id == 'prevFavsButton') {
         generateFavsTable(ev.target.dataset.nextstartindex);
+    }
+}
+
+var searchButton = document.getElementById('searchButton');
+
+// Form validation
+$( "#keyword" )
+.focusout(function() {
+    let val = $('#keyword').val();
+    if (/\S/.test(val)){
+        $( "#keyword" ).removeClass( "is-invalid" );
+        keywordIsValid = true; 
+        activateSearchButton();
+    }
+    else {
+        $( "#keyword" ).removeClass( "form-control" ).addClass( "form-control is-invalid" );  
+        keywordIsValid = false;  
+        activateSearchButton();
+    }
+})
+
+$( "#locationInputText" )
+.focusout(function() {
+    let val = $('#locationInputText').val();
+    if (/\S/.test(val)){
+        $( "#locationInputText" ).removeClass( "is-invalid" );
+        locationIsValid = true;
+        activateSearchButton();
+    }
+    else {
+        $( "#locationInputText" ).removeClass( "form-control" ).addClass( "form-control is-invalid" ); 
+        locationIsValid = false;
+        activateSearchButton();
+    }
+})
+
+$( "#keyword" ).keyup(function() {
+    let val = $('#keyword').val();
+    console.log(val);
+    if (/\S/.test(val)){
+        $( "#keyword" ).removeClass( "is-invalid" );
+        keywordIsValid = true; 
+        activateSearchButton();
+    }
+    else {
+        keywordIsValid = false;
+        activateSearchButton();    
+    }
+});
+
+$( "#locationInputText" ).keyup(function() {
+    console.log("check keyword and activate/deactivate submit button");
+    let val = $('#locationInputText').val();
+    console.log(val);
+    if (/\S/.test(val)){
+        $( "#locationInputText" ).removeClass( "is-invalid" );
+        locationIsValid = true;
+        activateSearchButton();
+    }
+    else {
+        locationIsValid = false;
+        searchButton.setAttribute('disabled','disabled');
+        activateSearchButton();
+    }
+});
+
+function activateSearchButton() {
+    var formElems = document.getElementById('mainForm').elements;
+    if (curLocObtained) {
+        if (keywordIsValid) {
+            if (formElems.namedItem("locationRadio").value == "location") {
+                if (locationIsValid) {
+                    searchButton.removeAttribute('disabled'); 
+                }
+                else {
+                    searchButton.setAttribute('disabled','disabled');
+                }
+            }
+            else {
+                searchButton.removeAttribute('disabled'); 
+            }
+        }
+        else {
+            searchButton.setAttribute('disabled','disabled'); 
+        }
     }
 }

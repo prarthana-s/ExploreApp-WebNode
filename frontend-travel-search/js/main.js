@@ -469,7 +469,6 @@ function processTableRowClick(ev){
                     starElem.classList.add("far");
                 }
 
-
                 infoFavButton.addEventListener('click', processInfoFav,false);
 
                 // Photos
@@ -677,14 +676,16 @@ function processTableRowClick(ev){
         // Rewrite updated array to local storage
         localStorage.setItem("favs", JSON.stringify(currentFavsArray));
 
-        // $('#pills-favorites').tab('show');
         // $(function () {
-        //     $('#pills-results-tab').tab('show');
+        //     // $('#pills-results-tab').tab('show');
+        //     $('#pills-favorites').tab('show');
         // })
 
         // $(function () {
         //     $('#pills-favorites-tab').tab('show');
         // })
+
+        generateFavsTable();
     }
 }
 
@@ -925,6 +926,8 @@ $('a[data-toggle="pill"]').on('show.bs.tab', function (e) {
     if (e.target.id == 'pills-favorites-tab' ) {
         generateFavsTable();
     }
+
+    // Cross verify if favourited items still exist as favorited items
     else if (e.target.id == 'pills-results-tab') {
         var allFavIcons = document.getElementsByClassName('favIcon');
         if (allFavIcons) {
@@ -983,8 +986,15 @@ function generateFavsTable() {
                 let placeID = favItem.place_id;
                 let lat = favItem.geometry.location.lat;
                 let lng = favItem.geometry.location.lng;
-
-                favsInnerHTML += '<tr><th scope="row">' + (parseInt(i)+1) + '</th>' +
+                let currentRowID = 'tr_' + placeID;
+                if (previousSelectedRow == currentRowID) {
+                    favsInnerHTML += '<tr id="tr_' + placeID + '" class="table-warning">';
+                }
+                else {
+                    favsInnerHTML += '<tr id="tr_' + placeID + '">';
+                }
+                
+                favsInnerHTML += '<th scope="row">' + (parseInt(i)+1) + '</th>' +
                 '<td><img class="placeIcon" src="' + icon + '" alt="user image"/></td>' + 
                 '<td class="placeName" data-placeid="' + placeID + '">' + name + '</td>' +
                 '<td class="addressInfo">' + address + '</td>' + 

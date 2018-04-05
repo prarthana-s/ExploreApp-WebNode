@@ -34,16 +34,16 @@ listButton.addEventListener('click',goBackToList,false);
 
 
 function initAutocomplete() {
-    autocomplete = new google.maps.places.Autocomplete(document.getElementById('fromLocation'));
-    autocomplete.addListener('place_changed', fillInFromLocation);
+    autocompleteInSearch = new google.maps.places.Autocomplete(document.getElementById('locationInputText'));
+    autocompleteInSearch.addListener('place_changed', fillInAddress);
 
-    autocomplete = new google.maps.places.Autocomplete(document.getElementById('locationInputText'));
-    autocomplete.addListener('place_changed', fillInAddress);
+    autocompleteInMap = new google.maps.places.Autocomplete(document.getElementById('fromLocation'));
+    autocompleteInMap.addListener('place_changed', fillInFromLocation);
 }
 initAutocomplete();
 
 function fillInAddress() {
-    var place = autocomplete.getPlace();
+    var place = autocompleteInSearch.getPlace();
     var formElems = document.getElementById('mainForm').elements;
     autocompleteFlag = true;
     formElems.namedItem("hereLatitude").value = place.geometry.location.lat();
@@ -183,7 +183,7 @@ function constructResultsTable(result, tracker=0) {
 
         else {
             tableHTML += '<div class="table-responsive" id="tableContainer">';
-            tableHTML += '<button type="button" id="detailsButton" class="btn btn-outline-dark float-right" disabled>Details<i class="fas fa-chevron-right fa-1x fa-float-right"></i></button>';
+            tableHTML += '<button type="button" class="btn btn-outline-dark float-right detailsButton" disabled>Details<i class="fas fa-chevron-right fa-1x fa-float-right"></i></button>';
             tableHTML += '<table class="table table-hover table-sm" id="placesTable">' + 
             '<tr><th scope="col">#</th>' + 
             '<th scope="col">Category</th>' + 
@@ -260,6 +260,13 @@ function constructResultsTable(result, tracker=0) {
         var nextButton = document.getElementById('nextButton');
         if (nextButton) {
             nextButton.addEventListener('click',displayNextResults,false);
+        }
+
+        var detailsButtons = document.getElementsByClassName('detailsButton');
+        if(detailsButtons) {
+            for (let i = 0 ; i < detailsButtons.length; i++) {
+                detailsButtons[i].style.display = 'block';
+            }
         }
 
         // var prevButton = document.getElementById('prevButton');
@@ -344,9 +351,6 @@ function processTableRowClick(ev){
         // Show progress bar
         document.getElementById('progressBar').removeAttribute("hidden");
 
-        var headerDiv = document.getElementById('detailsHeader');
-        headerDiv.innerHTML = results[index].name;
-
         var map;
 
         function getInfo() {
@@ -381,6 +385,9 @@ function processTableRowClick(ev){
         // using the place ID and location from the PlacesService.
         function callback(results, status) {
             if (status == google.maps.places.PlacesServiceStatus.OK) {
+
+                var headerDiv = document.getElementById('detailsHeader');
+                headerDiv.innerHTML = results.name;
 
                 console.log(results);
 
@@ -596,15 +603,25 @@ function processTableRowClick(ev){
         getInfo();
 
         let tableContainer = document.getElementById('tableContainer');
-        tableContainer.style.display = 'none';
+        if (tableContainer) {
+            tableContainer.style.display = 'none';
+        }
 
         // Hide progress bar
         document.getElementById('progressBar').setAttribute("hidden","hidden"); 
 
-        let detailsButton = document.getElementById('detailsButton');
-        detailsButton.removeAttribute("disabled");
+        let detailsButtons = document.getElementsByClassName('detailsButton');
+        if (detailsButtons) {
+            for (let i = 0 ; i < detailsButtons.length; i++) {
+                detailsButtons[i].removeAttribute("disabled");
+                detailsButtons[i].addEventListener('click',showDetailsPane,false);
+            }
+        }
 
-        detailsButton.addEventListener('click',showDetailsPane,false);
+        let favsContainer = document.getElementById('favTableContainer');
+        if (favsContainer) {
+            favsContainer.style.display = 'none';
+        }
 
         var tabInterface = document.getElementById('detailsContent');
         tabInterface.style.display = 'block';
@@ -857,7 +874,7 @@ function dropdownAction(ev) {
 }
 
 function fillInFromLocation() {
-    var place = autocomplete.getPlace();
+    var place = autocompleteInMap.getPlace();
     var formElems = document.getElementById('directionsForm').elements;
     formElems.namedItem("fromLatitude").value = place.geometry.location.lat();
     formElems.namedItem("fromLongitude").value = place.geometry.location.lng();
@@ -969,7 +986,8 @@ function generateFavsTable(startingIndex=0) {
         let length = favItems.length;
 
         if (favItems.length) {
-            favsInnerHTML = '<div class="table-responsive" id="favTableContainer">' + 
+            favsInnerHTML = '<div class="table-responsive" id="favTableContainer">' +
+            '<button type="button" class="btn btn-outline-dark float-right detailsButton" disabled>Details<i class="fas fa-chevron-right fa-1x fa-float-right"></i></button>' +  
             '<table class="table table-hover table-sm" id="favsTable">' + 
             '<tr><th scope="col">#</th>' + 
             '<th scope="col">Category</th>' + 
@@ -1041,6 +1059,20 @@ function generateFavsTable(startingIndex=0) {
     if (favsContainer) {
         favsContainer.addEventListener('click',processFavsTableClick,false);
     }
+
+    
+    var detailsButtons = document.getElementsByClassName('detailsButton');
+    if(detailsButtons) {
+        for (let i = 0 ; i < detailsButtons.length; i++) {
+            detailsButtons[i].style.display = 'block';
+        }
+        if (previousSelectedRow){
+            for (let i = 0 ; i < detailsButtons.length; i++) {
+                detailsButtons[i].removeAttribute("disabled");
+                detailsButtons[i].addEventListener('click',showDetailsPane,false);
+            }
+        }
+    }
 }
     
 function processInfoFav(ev) {
@@ -1055,10 +1087,14 @@ function showDetailsPane(ev) {
 
     var tabInterface = document.getElementById('detailsContent');
     tabInterface.style.display = 'block';
+
+    let favsContainer = document.getElementById('favTableContainer');
+    if (favsContainer) {
+        favsContainer.style.display = 'none';
+    }
 }
 
 function processFavsTableClick(ev) {
-    console.log(ev.target.id);
     if (ev.target.parentNode.className == 'detailsIcon' || ev.target.parentNode.className == 'delIcon') {
         processTableRowClick(ev);
     }

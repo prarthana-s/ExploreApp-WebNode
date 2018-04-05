@@ -14,6 +14,11 @@ var results;
 
 var favIndex = 1;
 
+var userCurrLat = null;
+var userCurrLon = null;
+
+var userSelectedLocation = null;
+
 // Enable Search button only after user's geolocation is fetched
 $.ajax({url: "http://ip-api.com/json", success: function(result){
     jsonObj = JSON.parse(JSON.stringify(result));
@@ -21,7 +26,10 @@ $.ajax({url: "http://ip-api.com/json", success: function(result){
     searchButton.removeAttribute('disabled'); 
 
     document.getElementById('hereLatitude').value = jsonObj.lat; 
-    document.getElementById('hereLongitude').value = jsonObj.lon;  
+    document.getElementById('hereLongitude').value = jsonObj.lon; 
+    
+    userCurrLat = jsonObj.lat;
+    userCurrLon = jsonObj.lon;
     
     var submitButton = document.getElementById('searchButton');
     submitButton.addEventListener('click',submitForm,false);
@@ -47,6 +55,8 @@ initAutocomplete();
 
 function fillInAddress() {
     var place = autocompleteInSearch.getPlace();
+    console.log(place);
+    userSelectedLocation = place.name + ", " + place.formatted_address;
     var formElems = document.getElementById('mainForm').elements;
     autocompleteFlag = true;
     formElems.namedItem("hereLatitude").value = place.geometry.location.lat();
@@ -67,6 +77,7 @@ radioSelectionHere.addEventListener('change',disableTextBox,false);
 // Example: User selected item from autocomplete list, but later entered a location text
 function toggleAutocomplete() {
     autocompleteFlag = false;
+    userSelectedLocation = null;
 }
 
 function toggleAutocompleteMap() {
@@ -131,6 +142,7 @@ function submitForm() {
                 .done(function( result ) {
                     lat = result.lat;
                     lon = result.lon;
+                    userSelectedLocation = result.addr;
                     
                     $.ajax({
                         method: "GET",
@@ -144,7 +156,7 @@ function submitForm() {
                 });
         }
         else {
-            // AJAX call to PHP script to fetch nearby places JSON data
+            // AJAX call to fetch nearby places JSON data
             $.ajax({
                 method: "GET",
                 url: "http://localhost:3000/nearbyPlaces",
@@ -348,7 +360,9 @@ function processTableRowClick(ev){
 
         if (previousSelectedRow) {
             var previousRow = document.getElementById(previousSelectedRow);
-            previousRow.classList.remove("table-warning");
+            if (previousRow) {
+                previousRow.classList.remove("table-warning");
+            }
         }
 
         previousSelectedRow = rowName;
@@ -589,6 +603,16 @@ function processTableRowClick(ev){
                 var toField = document.getElementById('toLocation');
                 toField.value = toFieldValue; 
 
+                var mainFormElems = document.getElementById('mainForm').elements;
+                var fromField = document.getElementById('fromLocation');
+                // Come back here
+                if (mainFormElems.namedItem("locationRadio").value == 'location') {
+                    fromField.value = userSelectedLocation;
+                }
+                else {
+                    fromField.value = "Your location";
+                }
+                
                 var formElems = document.getElementById('directionsForm').elements;
                 formElems.namedItem("toLatitude").value = results.geometry.location.lat();
                 formElems.namedItem("toLongitude").value = results.geometry.location.lng();
@@ -898,17 +922,24 @@ function obtainMapFromCoords() {
     var fromLat, fromLon;
     
     if (!autocompleteMapFlag) {
-        $.ajax({
-            method: "GET",
-            url: "http://localhost:3000/geocode",
-            crossDomain: true,
-            data: {locationInput: formElems.namedItem("fromLocation").value}
-            })
-            .done(function( result ) {
-                fromLat = result.lat;
-                fromLon = result.lon;
-                getDirections(fromLat,fromLon,toLat,toLng);
-        });
+        if (formElems.namedItem("fromLocation").value == 'My location' || formElems.namedItem("fromLocation").value == 'Your location' ){
+            fromLat = userCurrLat;
+            fromLon = userCurrLon;
+            getDirections(fromLat,fromLon,toLat,toLng);
+        }
+        else {
+            $.ajax({
+                method: "GET",
+                url: "http://localhost:3000/geocode",
+                crossDomain: true,
+                data: {locationInput: formElems.namedItem("fromLocation").value}
+                })
+                .done(function( result ) {
+                    fromLat = result.lat;
+                    fromLon = result.lon;
+                    getDirections(fromLat,fromLon,toLat,toLng);
+            });
+        }
     }
     else {
         fromLat = formElems.namedItem("fromLatitude").value;

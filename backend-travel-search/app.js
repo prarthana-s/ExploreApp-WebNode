@@ -25,7 +25,7 @@ app.get('/geocode', function(req, res) {
     let query = req.query;
 
     let locationInput = encodeURIComponent(query.locationInput);
-    let location = {lat: '', lon: ''};
+    let location = {addr: '', lat: '', lon: ''};
 
     let url = `https://maps.googleapis.com/maps/api/geocode/json?address=${locationInput}&key=${googleKey}`
     
@@ -34,6 +34,7 @@ app.get('/geocode', function(req, res) {
             console.log('error:', error);
         } else {
             body = JSON.parse(body);
+            location.name = body.results[0].formatted_address;
             location.lat = body.results[0].geometry.location.lat;
             location.lon = body.results[0].geometry.location.lng;
             res.send(location);

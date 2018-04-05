@@ -28,6 +28,7 @@ $.ajax({url: "http://ip-api.com/json", success: function(result){
 }});
 
 var autocompleteFlag = false;
+var autocompleteMapFlag = false;
 
 var listButton = document.getElementById('backToList');
 listButton.addEventListener('click',goBackToList,false);
@@ -39,6 +40,8 @@ function initAutocomplete() {
 
     autocompleteInMap = new google.maps.places.Autocomplete(document.getElementById('fromLocation'));
     autocompleteInMap.addListener('place_changed', fillInFromLocation);
+
+    document.getElementById('fromLocation').addEventListener('change',toggleAutocompleteMap, false);
 }
 initAutocomplete();
 
@@ -65,6 +68,11 @@ radioSelectionHere.addEventListener('change',disableTextBox,false);
 function toggleAutocomplete() {
     autocompleteFlag = false;
 }
+
+function toggleAutocompleteMap() {
+    autocompleteMapFlag = false;
+}
+
 
 // If "Location" is selected, enable the text field and make it required
 function toggleRequired() {
@@ -586,7 +594,7 @@ function processTableRowClick(ev){
                 formElems.namedItem("toLongitude").value = results.geometry.location.lng();
 
                 var mapSubmitButton = document.getElementById('submitMapForm');
-                mapSubmitButton.addEventListener('click',getDirections,false);
+                mapSubmitButton.addEventListener('click',obtainMapFromCoords,false);
 
                 var toggleStreetButton = document.getElementById('streetViewToggle');
                 toggleStreetButton.addEventListener('click',toggleStreetView,false);
@@ -876,19 +884,41 @@ function dropdownAction(ev) {
 function fillInFromLocation() {
     var place = autocompleteInMap.getPlace();
     var formElems = document.getElementById('directionsForm').elements;
+    autocompleteMapFlag = true;
     formElems.namedItem("fromLatitude").value = place.geometry.location.lat();
     formElems.namedItem("fromLongitude").value = place.geometry.location.lng();
 }
 
-function getDirections(){
+function obtainMapFromCoords() {
     var formElems = document.getElementById('directionsForm').elements;
-
+    
     var toLat = formElems.namedItem("toLatitude").value;
     var toLng = formElems.namedItem("toLongitude").value;
     
-    var fromLat = formElems.namedItem("fromLatitude").value;
-    var fromLon = formElems.namedItem("fromLongitude").value;
+    var fromLat, fromLon;
+    
+    if (!autocompleteMapFlag) {
+        $.ajax({
+            method: "GET",
+            url: "http://localhost:3000/geocode",
+            crossDomain: true,
+            data: {locationInput: formElems.namedItem("fromLocation").value}
+            })
+            .done(function( result ) {
+                fromLat = result.lat;
+                fromLon = result.lon;
+                getDirections(fromLat,fromLon,toLat,toLng);
+        });
+    }
+    else {
+        fromLat = formElems.namedItem("fromLatitude").value;
+        fromLon = formElems.namedItem("fromLongitude").value;
+        getDirections(fromLat,fromLon,toLat,toLng);
+    }
+}
 
+function getDirections(fromLat,fromLon,toLat,toLng){
+    var formElems = document.getElementById('directionsForm').elements;
     var directionsService = new google.maps.DirectionsService();
     var directionsDisplay = new google.maps.DirectionsRenderer();
     var originCoords = new google.maps.LatLng(fromLat,fromLon);

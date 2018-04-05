@@ -153,7 +153,8 @@ function submitForm() {
 // var prevPageFlag;
 // var prevResult;
 
-function constructResultsTable(result, tracker) {
+function constructResultsTable(result, tracker=0) {
+    console.log(results);
     jsonObj = result;
 
     if (jsonObj) {
@@ -923,6 +924,38 @@ function toggleStreetView() {
 $('a[data-toggle="pill"]').on('show.bs.tab', function (e) {
     if (e.target.id == 'pills-favorites-tab' ) {
         generateFavsTable();
+    }
+    else if (e.target.id == 'pills-results-tab') {
+        var allFavIcons = document.getElementsByClassName('favIcon');
+        if (allFavIcons) {
+            if ("favs" in localStorage) {
+                favsArray = localStorage.getItem("favs");
+            }
+
+            var favChecker = false;
+            for (let i = 0 ; i < allFavIcons.length; i++) {
+                let starElem = allFavIcons[i].childNodes[0];
+                let isFav = starElem.classList.contains('filledStar');
+                if (isFav) {
+                    placeID = allFavIcons[i].dataset.placeid;
+                    if (favsArray) {
+                        currentFavsArray = JSON.parse(favsArray);
+                        for (let i = 0 ; i < currentFavsArray.length; i++) {
+                            if (placeID in currentFavsArray[i]) {
+                                favChecker = true;
+                                break;
+                            }
+                        }
+                        if (!favChecker) {
+                            starElem.classList.remove("filledStar");
+                            starElem.classList.remove("fas");
+                            starElem.classList.add("far");
+                        }
+                        favChecker = false;
+                    }
+                }
+            }
+        }
     }
 })
 

@@ -222,7 +222,7 @@ function constructResultsTable(result, tracker) {
                         }
                     }
                 }
-                
+
                 if (!isFavItem){
                     tableHTML +='<td class="favIcon" data-index="' + i + '" data-placeID="' + placeID + '"><i class="far fa-star fa-1x fa-pull-left fa-border fav"></i></td>'; 
                 }
@@ -341,6 +341,9 @@ function processTableRowClick(ev){
         // Show progress bar
         document.getElementById('progressBar').removeAttribute("hidden");
 
+        var headerDiv = document.getElementById('detailsHeader');
+        headerDiv.innerHTML = results[index].name;
+
         var map;
 
         function getInfo() {
@@ -406,6 +409,9 @@ function processTableRowClick(ev){
                     info['Website'] = '<a target="_blank" href="' + results.website + '">' + results.website + '</a>';
                 }
 
+                // Open Hours Modal Pane
+                var utc_offset = results.urc_offset;
+                console.log(moment().utcOffset(utc_offset));
                 var hours = results.opening_hours;
                 if (hours) {
                     var hoursStatus = (hours.open_now == 1 ? "Open now:" : "Closed now:");
@@ -435,7 +441,34 @@ function processTableRowClick(ev){
 
                 var infoFavButton = document.getElementsByClassName('infoFavIcon')[0];
                 infoFavButton.dataset.index = index;
-                infoFavButton.dataset.placeID = placeID;
+                infoFavButton.dataset.placeid = placeID;
+                let starElem = infoFavButton.childNodes[0];
+
+                var isFav = false;
+                if ("favs" in localStorage) {
+                    favsArray = localStorage.getItem("favs");
+                }
+                if (favsArray) {
+                    currentFavsArray = JSON.parse(favsArray);
+                    for (let i = 0 ; i < currentFavsArray.length; i++) {
+                        if (placeID in currentFavsArray[i]) {
+                            starElem.classList.add("filledStar");
+                            starElem.classList.remove("far");
+                            starElem.classList.add("fas");
+                            isFav = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!isFav) {
+                    // Replace filled star by empty star
+                    starElem.classList.remove("filledStar");
+                    starElem.classList.remove("fas");
+                    starElem.classList.add("far");
+                }
+
+
                 infoFavButton.addEventListener('click', processInfoFav,false);
 
                 // Photos
@@ -562,6 +595,8 @@ function processTableRowClick(ev){
 
         let detailsButton = document.getElementById('detailsButton');
         detailsButton.removeAttribute("disabled");
+
+        detailsButton.addEventListener('click',showDetailsPane,false);
 
         var tabInterface = document.getElementById('detailsContent');
         tabInterface.style.display = 'block';
@@ -946,4 +981,12 @@ function processInfoFav(ev) {
     // Treat the fav icon click as if clicked in row
     console.log("fav info clicked!");
     processTableRowClick(ev);
+}
+
+function showDetailsPane(ev) {
+    let tableContainer = document.getElementById('tableContainer');
+    tableContainer.style.display = 'none';
+
+    var tabInterface = document.getElementById('detailsContent');
+    tabInterface.style.display = 'block';
 }

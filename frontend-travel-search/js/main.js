@@ -52,6 +52,11 @@ var autocompleteMapFlag = false;
 var listButton = document.getElementById('backToList');
 listButton.addEventListener('click',goBackToList,false);
 
+function resetFunc() {
+    document.getElementById('pills-results').innerHTML = '';
+    document.getElementById('detailsContent').innerHTML = '';
+    $('#pills-results-tab').tab('show')
+}
 
 function initAutocomplete() {
     autocompleteInSearch = new google.maps.places.Autocomplete(document.getElementById('locationInputText'));
@@ -151,7 +156,7 @@ function submitForm() {
         if (!autocompleteFlag && formElems.namedItem("locationRadio").value == 'location') {
             $.ajax({
                 method: "GET",
-                url: "http://localhost:3000/geocode",
+                url: "http://localhost:8081/geocode",
                 crossDomain: true,
                 data: {locationInput: formElems.namedItem("locationInput").value}
                 })
@@ -162,7 +167,7 @@ function submitForm() {
                     
                     $.ajax({
                         method: "GET",
-                        url: "http://localhost:3000/nearbyPlaces",
+                        url: "http://localhost:8081/nearbyPlaces",
                         crossDomain: true,
                         data: {keyword: formElems.namedItem("keyword").value, category: formElems.namedItem("category").value, distance: formElems.namedItem("distance").value, locationRadio: formElems.namedItem("locationRadio").value, locationInput: formElems.namedItem("locationInput").value, hereLatitude: lat, hereLongitude: lon}
                         })
@@ -177,7 +182,7 @@ function submitForm() {
             // AJAX call to fetch nearby places JSON data
             $.ajax({
                 method: "GET",
-                url: "http://localhost:3000/nearbyPlaces",
+                url: "http://localhost:8081/nearbyPlaces",
                 crossDomain: true,
                 data: {keyword: formElems.namedItem("keyword").value, category: formElems.namedItem("category").value, distance: formElems.namedItem("distance").value, locationRadio: formElems.namedItem("locationRadio").value, locationInput: formElems.namedItem("locationInput").value, hereLatitude: lat, hereLongitude: lon}
                 })
@@ -327,7 +332,7 @@ function displayNextResults(ev) {
 
     $.ajax({
         method: "GET",
-        url: "http://localhost:3000/nextPage",
+        url: "http://localhost:8081/nextPage",
         crossDomain: true,
         data: {nextPageToken: nextPageToken}
         })
@@ -628,7 +633,7 @@ function processTableRowClick(ev){
 
                 $.ajax({
                     method: "GET",
-                    url: "http://localhost:3000/yelpReviews",
+                    url: "http://localhost:8081/yelpReviews",
                     crossDomain: true,
                     data: yelpParams
                     })
@@ -996,7 +1001,7 @@ function obtainMapFromCoords() {
         else {
             $.ajax({
                 method: "GET",
-                url: "http://localhost:3000/geocode",
+                url: "http://localhost:8081/geocode",
                 crossDomain: true,
                 data: {locationInput: formElems.namedItem("fromLocation").value}
                 })
@@ -1015,6 +1020,9 @@ function obtainMapFromCoords() {
 }
 
 function getDirections(fromLat,fromLon,toLat,toLng){
+    // If Get Directions is clicked more than once, clear the old directions panel
+    document.getElementById('directionsPanel').innerHTML = '';
+    
     var formElems = document.getElementById('directionsForm').elements;
     var directionsService = new google.maps.DirectionsService();
     var directionsDisplay = new google.maps.DirectionsRenderer();

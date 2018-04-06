@@ -4,7 +4,8 @@
   "description": "A responsive web application that lets you search entertainment and travel destinations, with integrated Google Maps and directions",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start" : "node app.js"
   },
   "author": "Prarthana S. Sannamani",
   "license": "ISC",

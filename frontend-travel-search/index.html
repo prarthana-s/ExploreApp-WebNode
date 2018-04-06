@@ -20,7 +20,7 @@
     
             <div id="formHeading">Travel and Entertainment Search</div>
     
-            <form id="mainForm" class="needs-validation" novalidate>
+            <form id="mainForm" onreset="resetFunc()" class="needs-validation" novalidate>
     
                 <div class="form-group row keywordElement">
                     <label for="keyword" class="col-sm-2 col-form-label">Keyword*</label>
@@ -110,7 +110,7 @@
                 <div class="form-group row">
                     <div class="col-sm-10">
                     <button type="button" id="searchButton" class="btn btn-primary" name="submit" value="search" disabled><i class="fas fa-search"></i>&nbsp;Search</button>
-                    <button type="clear" class="btn btn-primary" name="clear" value="clear">Clear</button>
+                    <button type="reset" class="btn btn-primary" name="clear" value="clear">Clear</button>
                     </div>
                 </div>
             </form>
@@ -296,8 +296,8 @@
         moment().format();
     </script>
     <script type="text/javascript" async src="https://platform.twitter.com/widgets.js"></script>
-    <link rel="stylesheet" href="css/style.css">  
-    <script src="js/main.js"></script>
+    <link type="text/css" rel="stylesheet" href="css/style.css">  
+    <script type="text/javascript" src="js/main.js"></script>
 
     </body>
 </html>

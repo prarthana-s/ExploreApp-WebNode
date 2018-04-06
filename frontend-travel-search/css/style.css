@@ -23,10 +23,6 @@ img.placeIcon {
     border-radius: .1em;
     margin: .25em .25em .25em;
 }
-/* 
-#detailsContent {
-    display: none;
-} */
 
 .filledStar {
     color: orange;
@@ -66,52 +62,29 @@ img.placeIcon {
     display: none;
 }
 
-/* @media (min-width:576px) {
-    .card-columns {
-      column-count: 1;
-    }
-}
-  @media (min-width:768px) {
-    .card-columns {
-      column-count: 4;
-    }
-}
-@media (min-width:992px) {
-    .card-columns {
-      column-count: 4;
-    }
-}
-@media (min-width:1200px) {
-    .card-columns {
-      column-count: 4;
-    }
-} */
-
 .row {
     display: flex;
     flex-wrap: wrap;
     padding: 0 4px;
   }
   
-  /* Create four equal columns that sits next to each other */
-  .column {
+.column {
     flex: 25%;
     max-width: 25%;
     padding: 0 4px;
-  }
+}
   
-  .column img {
-    margin-top: 8px;
-    vertical-align: middle;
-  }
-  
-  /* Responsive layout - makes the two columns stack on top of each other instead of next to each other */
-  @media screen and (max-width: 600px) {
-    .column {
-      flex: 100%;
-      max-width: 100%;
+.column img {
+margin-top: 8px;
+vertical-align: middle;
+}
+
+@media screen and (max-width: 600px) {
+.column {
+        flex: 100%;
+        max-width: 100%;
     }
-  }
+}
 
 .animateDetailsPanel {
     transition: all linear 0.5s;

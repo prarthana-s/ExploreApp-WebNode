@@ -14,6 +14,11 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 // var urlebody = bodyParser.urlencoded({ extended: false });
 
+app.use(express.static('public'));
+app.get('/index.html', function(req,res) {
+    res.sendFile( __dirname + "/" + "index.html");
+})
+
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -147,127 +152,9 @@ app.get('/yelpReviews', function(req, res) {
     
 });
     
-
-// Separate yelp-fusion API calls
-
-// app.get('/yelpReviews', function(req, res) {
-
-//     'use strict';
-    
-//     const yelp = require('yelp-fusion');
-    
-//     const client = yelp.client(yelpKey);
-    
-//     client.reviews('gary-danko-san-francisco').then(response => {
-//       console.log(response.jsonBody.reviews[0].text);
-//     }).catch(e => {
-//       console.log(e);
-//     }); 
-
-// });
-
-// app.get('/yelpBestMatch', function(req, res) {
-    
-//     'use strict';
-    
-//     const yelp = require('yelp-fusion');
-    
-//     const client = yelp.client(yelpKey);
-    
-//     // matchType can be 'lookup' or 'best'
-//     client.businessMatch('best', {
-//       name: 'Pannikin Coffee & Tea',
-//       address1: '510 N Coast Hwy 101',
-//       address2: 'Encinitas, CA 92024',
-//       city: 'Encinitas',
-//       state: 'CA',
-//       country: 'US'
-//     }).then(response => {
-//       console.log(response.jsonBody.businesses);
-//     }).catch(e => {
-//       console.log(e);
-//     });
-
-// });
-
-
-
-// Vanilla NodeJS Yelp API calls
-
-// app.get('/yelpBestMatch', function(req, res) {
-    
-//     let country = 'US';
-
-//     // Make these dynamic
-//     let name = encodeURIComponent('Starbucks');
-//     let city = encodeURIComponent('Los Angeles');
-//     let state = 'CA';
-//     let url = `https://api.yelp.com/v3/businesses/matches/best?name=${name}&city=${city}&state=${state}&country=${country}`;
-
-//     request.get(url, {
-//         'auth': {
-//           'bearer': yelpKey
-//         }
-//       }, function (err, response, body) {
-//         if(err){
-//             console.log('error:', error);
-//         } else {
-//             console.log('body:', body);
-//             body = JSON.parse(body);
-//             console.log(body);
-//         }
-//     });
-// });
-
-
-
-// app.get('/yelpReviews', function(req, res) {
-    
-//     let id = 'gary-danko-san-francisco';
-
-//     let url = `https://api.yelp.com/v3/businesses/${id}/reviews`;
-
-//     request.get(url, {
-//         'auth': {
-//           'bearer': yelpKey
-//         }
-//       }, function (err, response, body) {
-//         if(err){
-//             console.log('error:', error);
-//         } else {
-//             console.log('body:', body);
-//             body = JSON.parse(body);
-//             console.log(body);
-//         }
-//     });
-// });
-
-
-
-
-app.listen(3000, () => console.log('Example app listening on port 3000!'))
-
-
-// Vanilla NodeJS GET Request code
-
-// let locationName = encodeURIComponent('University of Southern California');
-// let url = `https://maps.googleapis.com/maps/api/geocode/json?address=${locationName}&key=${googleKey}`
-
-// https.get(url, res => {
-//   res.setEncoding("utf8");
-//   let body = "";
-//   res.on("data", data => {
-//     body += data;
-//   });
-//   res.on("end", () => {
-//     body = JSON.parse(body);
-//     console.log(
-//       `City: ${body.results[0].formatted_address} -`,
-//       `Latitude: ${body.results[0].geometry.location.lat} -`,
-//       `Longitude: ${body.results[0].geometry.location.lng}`
-//     );
-//   });
-// });
-
+var port = process.env.PORT || 8081;
+app.listen(port, function() {
+    console.log("Server started on port 8081");
+});
 
 

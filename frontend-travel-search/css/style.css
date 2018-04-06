@@ -114,19 +114,20 @@ img.placeIcon {
   }
 
 .animateDetailsPanel {
-    transition: all linear 1s;
+    transition: all linear 0.5s;
     width: 100%;
     background: white;
     position: relative;
-    left: 0px;
+    right: 0px;
 }
 
 .animateDetailsPanel.ng-hide {
-    left: 1000px;
+    transition: all linear 0.5s;
+    right: 1000px;
 }
 
 .animateResultsPanel {
-    transition: all linear 1s;
+    transition: all linear 0.5s;
     width: 100%;
     background: white;
     position: relative;

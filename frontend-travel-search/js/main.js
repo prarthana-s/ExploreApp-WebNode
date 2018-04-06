@@ -2,16 +2,6 @@ var app = angular.module('myApp', ['ngAnimate']);
 app.controller('myCtrl', function($scope) {
     $scope.animateDetails = false;
     console.log($scope.animateDetails);
-
-    $scope.toggleAnimation = function() {
-        // $scope.animateDetails = true;
-        // $scope.apply();
-        console.log("clicked");
-        var scope = angular.element(document.getElementById('detailsContent')).scope();
-        console.log(scope);
-        scope.animateDetails = true;
-        scope.$apply();
-    }
 });
 // This is defined globally to fetch the current script
 // Used later to fetch images from server for "Photos" feature
@@ -804,9 +794,12 @@ function goBackToList(ev) {
     let tableContainer = document.getElementById('tableContainer');
     tableContainer.style.display = 'block';
 
-    let tabInterface = document.getElementById('detailsContent');
-    tabInterface.style.display = 'none';
+    // let tabInterface = document.getElementById('detailsContent');
+    // tabInterface.style.display = 'none';
 
+    var scopeDetails = angular.element(document.getElementById('detailsContent')).scope();
+    scopeDetails.animateDetails = false;
+    scopeDetails.$apply();
 }
 
 function generateYelpReviews(yelpReviews, originalResult=0) {

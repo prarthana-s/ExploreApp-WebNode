@@ -1,7 +1,8 @@
 var app = angular.module('myApp', ['ngAnimate']);
 app.controller('myCtrl', function($scope) {
     $scope.animateDetails = false;
-    console.log($scope.animateDetails);
+    $scope.animateResults = true;
+    // console.log($scope.animateDetails);
 });
 // This is defined globally to fetch the current script
 // Used later to fetch images from server for "Photos" feature
@@ -219,7 +220,7 @@ function constructResultsTable(result, currPageNumber) {
         }
 
         else {
-            tableHTML += '<div class="table-responsive" id="tableContainer" ng-hide="animateDetails">';
+            tableHTML += '<div class="table-responsive animateResultsPanel" id="tableContainer" ng-show="animateResults">';
             tableHTML += '<button type="button" class="btn btn-outline-dark float-right detailsButton" disabled>Details<i class="fas fa-chevron-right fa-1x fa-float-right"></i></button>';
             tableHTML += '<table class="table table-hover table-sm" id="placesTable">' + 
             '<tr><th scope="col">#</th>' + 
@@ -711,6 +712,7 @@ function processTableRowClick(ev){
 
         var scopeDetails = angular.element(document.getElementById('detailsContent')).scope();
         scopeDetails.animateDetails = true;
+        scopeDetails.animateResults = false;
         scopeDetails.$apply();
 
     }
@@ -791,14 +793,21 @@ function processTableRowClick(ev){
 }
 
 function goBackToList(ev) {
-    let tableContainer = document.getElementById('tableContainer');
-    tableContainer.style.display = 'block';
+    if (ev.target.parentNode.dataset.from == 'results'){
+        let tableContainer = document.getElementById('tableContainer');
+        tableContainer.style.display = 'block';
+    }
+    else {
+        let favTableContainer = document.getElementById('favTableContainer');
+        favTableContainer.style.display = 'block';
+    }
 
     // let tabInterface = document.getElementById('detailsContent');
     // tabInterface.style.display = 'none';
 
     var scopeDetails = angular.element(document.getElementById('detailsContent')).scope();
     scopeDetails.animateDetails = false;
+    scopeDetails.animateResults = true;
     scopeDetails.$apply();
 }
 
@@ -1057,10 +1066,12 @@ function toggleStreetView() {
 $('a[data-toggle="pill"]').on('show.bs.tab', function (e) {
     if (e.target.id == 'pills-favorites-tab' ) {
         generateFavsTable(0);
+        listButton.dataset.from = 'favs';
     }
 
     // Cross verify if favourited items still exist as favorited items
     else if (e.target.id == 'pills-results-tab') {
+        listButton.dataset.from = 'results';
         var allFavIcons = document.getElementsByClassName('favIcon');
         if (allFavIcons) {
             if ("favs" in localStorage) {

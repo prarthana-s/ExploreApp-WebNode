@@ -28,15 +28,15 @@ app.get('/geocode', function(req, res) {
     let location = {addr: '', lat: '', lon: ''};
 
     let url = `https://maps.googleapis.com/maps/api/geocode/json?address=${locationInput}&key=${googleKey}`
-    
     request(url, function (err, response, body) {
         if(err){
             console.log('error:', error);
         } else {
             body = JSON.parse(body);
-            location.name = body.results[0].formatted_address;
+            location.addr = body.results[0].formatted_address;
             location.lat = body.results[0].geometry.location.lat;
             location.lon = body.results[0].geometry.location.lng;
+            console.log(location);
             res.send(location);
         }
     });

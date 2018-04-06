@@ -110,6 +110,7 @@ function disableTextBox() {
         textInput.classList.remove('is-invalid');
         textInput.removeAttribute('required');  
         textInput.value = "";
+        activateSearchButton();        
     }
 }
 
@@ -265,7 +266,6 @@ function constructResultsTable(result, currPageNumber) {
 
 
         if (prevPageFlag) {
-            console.log("show previous button");
             tableHTML += '<button type="button" id="prevButton" class="btn btn-outline-dark">Previous</button>';
         }
 
@@ -362,6 +362,14 @@ function arrayRotate(arr, count) {
     return arr
 }
 
+var createGroupedArray = function(arr, chunkSize) {
+    var groups = [], i;
+    for (i = 0; i < arr.length; i += chunkSize) {
+        groups.push(arr.slice(i, i + chunkSize));
+    }
+    return groups;
+}
+
 var previousSelectedRow = null;
 
 function processTableRowClick(ev){
@@ -429,8 +437,6 @@ function processTableRowClick(ev){
                 var headerDiv = document.getElementById('detailsHeader');
                 headerDiv.innerHTML = results.name;
 
-                console.log(results);
-
                 // Info tab 
 
                 var info = {};
@@ -464,7 +470,6 @@ function processTableRowClick(ev){
                 var utc_offset = results.urc_offset;
                 var todayDay = moment.utc(utc_offset).format("dddd");
                 var hours = results.opening_hours;
-                console.log(hours);
                 if (hours) {
                     var dailyOpenModal = '<a href="#" data-toggle="modal" data-target="#exampleModalCenter">Daily Open Hours</a>';
                     var weekdayText = hours.weekday_text;
@@ -551,34 +556,26 @@ function processTableRowClick(ev){
 
                 infoFavButton.addEventListener('click', processInfoFav,false);
 
+
                 // Photos
                 if (results.photos) {
-                    var numPhotos = results.photos.length;
-                    var rows;
-
-                    switch(numPhotos) {
-                        case 1,2,3,4: { rows = 1; break;}
-                        case 5,6,7,8: { rows = 2; break;}
-                        case 9,10: { rows = 3; break; }
-                    }
-
+                    var chunkedPhotoArr = createGroupedArray(results.photos,4);
                     var photosContainer = document.getElementById('photosDisplay');
-                    var photosHTML = '';
-                    var k = 0;
-                    for (let i = 0; i < rows; i++) {
-                        photosHTML += '<div class="row">';
-                        for (let j = 0; j < 4; j++) {
-                            if (k < numPhotos) {
-                                var photoLink = results.photos[k].getUrl({'maxWidth': results.photos[k].width , 'maxHeight': results.photos[k].height });                            
-                                k++;
-                                photosHTML += '<div class="col-sm-3"><a target="_blank" href="' + photoLink + '"><img class="img-fluid img-thumbnail" src="' + photoLink + '"/></a></div>'; 
-                            }
-                            else {
-                                break;
+                    var photosHTML = '<div class="row">';
+                    for (let i = 0 ; i < chunkedPhotoArr[0].length; i++) {
+                        photosHTML += '<div class="column">';
+                        for (let j = 0 ; j < chunkedPhotoArr.length; j++) {
+                            if (chunkedPhotoArr[j][i]) {
+                                let photoLink = chunkedPhotoArr[j][i].getUrl({'maxWidth': chunkedPhotoArr[j][i].width , 'maxHeight': chunkedPhotoArr[j][i].height });                            
+                                if (photoLink) {
+                                    photosHTML += '<img class="img-thumbnail" src="' + photoLink + '" alt="Card image cap">';
+                                }
                             }
                         }
                         photosHTML += '</div>';
                     }
+                    photosHTML += '</div>';
+
                     photosContainer.innerHTML = photosHTML;
                 }
 
@@ -759,7 +756,6 @@ function processTableRowClick(ev){
     }
     else if (target.className == 'delIcon') { 
         let placeID = target.dataset.placeid;
-        console.log(placeID);
         // Obtain local storage contents
         let favsArray = localStorage.getItem("favs");
 
@@ -1181,7 +1177,6 @@ function generateFavsTable(startingIndex=0) {
     
 function processInfoFav(ev) {
     // Treat the fav icon click as if clicked in row
-    console.log("fav info clicked!");
     processTableRowClick(ev);
 }
 
@@ -1242,7 +1237,6 @@ $( "#locationInputText" )
 
 $( "#keyword" ).keyup(function() {
     let val = $('#keyword').val();
-    console.log(val);
     if (/\S/.test(val)){
         $( "#keyword" ).removeClass( "is-invalid" );
         keywordIsValid = true; 
@@ -1255,9 +1249,7 @@ $( "#keyword" ).keyup(function() {
 });
 
 $( "#locationInputText" ).keyup(function() {
-    console.log("check keyword and activate/deactivate submit button");
     let val = $('#locationInputText').val();
-    console.log(val);
     if (/\S/.test(val)){
         $( "#locationInputText" ).removeClass( "is-invalid" );
         locationIsValid = true;

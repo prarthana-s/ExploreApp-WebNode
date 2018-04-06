@@ -23,10 +23,10 @@ img.placeIcon {
     border-radius: .1em;
     margin: .25em .25em .25em;
 }
-
+/* 
 #detailsContent {
     display: none;
-}
+} */
 
 .filledStar {
     color: orange;
@@ -112,3 +112,27 @@ img.placeIcon {
       max-width: 100%;
     }
   }
+
+.animateDetailsPanel {
+    transition: all linear 1s;
+    width: 100%;
+    background: white;
+    position: relative;
+    left: 0px;
+}
+
+.animateDetailsPanel.ng-hide {
+    left: 1000px;
+}
+
+.animateResultsPanel {
+    transition: all linear 1s;
+    width: 100%;
+    background: white;
+    position: relative;
+    right: 0px;
+}
+
+.animateDetailsPanel.ng-hide {
+    right: 1000px;
+}

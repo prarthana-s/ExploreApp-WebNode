@@ -1,3 +1,18 @@
+var app = angular.module('myApp', ['ngAnimate']);
+app.controller('myCtrl', function($scope) {
+    $scope.animateDetails = false;
+    console.log($scope.animateDetails);
+
+    $scope.toggleAnimation = function() {
+        // $scope.animateDetails = true;
+        // $scope.apply();
+        console.log("clicked");
+        var scope = angular.element(document.getElementById('detailsContent')).scope();
+        console.log(scope);
+        scope.animateDetails = true;
+        scope.$apply();
+    }
+});
 // This is defined globally to fetch the current script
 // Used later to fetch images from server for "Photos" feature
 var script = document.currentScript;
@@ -214,7 +229,7 @@ function constructResultsTable(result, currPageNumber) {
         }
 
         else {
-            tableHTML += '<div class="table-responsive" id="tableContainer">';
+            tableHTML += '<div class="table-responsive" id="tableContainer" ng-hide="animateDetails">';
             tableHTML += '<button type="button" class="btn btn-outline-dark float-right detailsButton" disabled>Details<i class="fas fa-chevron-right fa-1x fa-float-right"></i></button>';
             tableHTML += '<table class="table table-hover table-sm" id="placesTable">' + 
             '<tr><th scope="col">#</th>' + 
@@ -556,7 +571,6 @@ function processTableRowClick(ev){
 
                 infoFavButton.addEventListener('click', processInfoFav,false);
 
-
                 // Photos
                 if (results.photos) {
                     var chunkedPhotoArr = createGroupedArray(results.photos,4);
@@ -568,7 +582,7 @@ function processTableRowClick(ev){
                             if (chunkedPhotoArr[j][i]) {
                                 let photoLink = chunkedPhotoArr[j][i].getUrl({'maxWidth': chunkedPhotoArr[j][i].width , 'maxHeight': chunkedPhotoArr[j][i].height });                            
                                 if (photoLink) {
-                                    photosHTML += '<img class="img-thumbnail" src="' + photoLink + '" alt="Card image cap">';
+                                    photosHTML += '<a target="_blank" href="' + photoLink + '"><img class="img-thumbnail" src="' + photoLink + '" alt="Card image cap"/></a>';
                                 }
                             }
                         }
@@ -674,7 +688,10 @@ function processTableRowClick(ev){
         }
         getInfo();
 
-        let tableContainer = document.getElementById('tableContainer');
+        // var scope = angular.element(document.getElementById('tableContainer'));
+        // scope.animateDetails = true;
+        // scope.$apply();
+        var tableContainer = document.getElementById('tableContainer');
         if (tableContainer) {
             tableContainer.style.display = 'none';
         }
@@ -695,8 +712,16 @@ function processTableRowClick(ev){
             favsContainer.style.display = 'none';
         }
 
-        var tabInterface = document.getElementById('detailsContent');
-        tabInterface.style.display = 'block';
+        // var scopeFav = angular.element(document.getElementById('favTableContainer')).scope();
+        // scopeFav.animateDetails = true;
+        // scopeFav.$apply();
+
+        // var tabInterface = document.getElementById('detailsContent');
+        // tabInterface.style.display = 'block';
+
+        var scopeDetails = angular.element(document.getElementById('detailsContent')).scope();
+        scopeDetails.animateDetails = true;
+        scopeDetails.$apply();
 
     }
     else if (target.className == 'favIcon' || target.className == 'infoFavIcon') {
@@ -1184,8 +1209,8 @@ function showDetailsPane(ev) {
     let tableContainer = document.getElementById('tableContainer');
     tableContainer.style.display = 'none';
 
-    var tabInterface = document.getElementById('detailsContent');
-    tabInterface.style.display = 'block';
+    // var tabInterface = document.getElementById('detailsContent');
+    // tabInterface.style.display = 'block';
 
     let favsContainer = document.getElementById('favTableContainer');
     if (favsContainer) {

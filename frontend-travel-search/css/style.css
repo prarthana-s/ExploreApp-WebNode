@@ -37,6 +37,12 @@ img.placeIcon {
     width: 50px
 }
 
+.yelpAuthorPic {
+    height: 50px;
+    width: 50px;
+    border-radius: 40px;
+}
+
 #twitterButton {
     height: 30px;
     width: 30px;

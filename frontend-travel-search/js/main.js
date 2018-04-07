@@ -791,7 +791,7 @@ function processTableRowClick(ev){
                 break;
             }
         }
-        
+
         curFavsArrayLen = currentFavsArray.length;
         if (curFavsArrayLen % 20 == 0) {
             startIndex = curFavsArrayLen - 20;
@@ -832,7 +832,7 @@ function generateYelpReviews(yelpReviews, originalResult=0) {
 
     for (let i = 0 ; i < yelpReviews.length; i++) {
         yelpReviewsHTML += '<div class="card reviewsCard"><div class="card-body"><div class="media"> \
-            <a target="_blank" href="' + yelpReviews[i].url + '"><img class="align-self-start mr-3 authorPic" src="' + yelpReviews[i].user.image_url +'" alt="Generic placeholder image"/></a>\
+            <a target="_blank" href="' + yelpReviews[i].url + '"><img class="align-self-start mr-3 yelpAuthorPic" src="' + yelpReviews[i].user.image_url +'" alt="Generic placeholder image"/></a>\
             <div class="media-body"><a target="_blank" href="' + yelpReviews[i].url + '"><h6 class="mt-0 card-text author-name authorName">' + yelpReviews[i].user.name + '</h6></a>';
 
         for (let j = 0 ; j < yelpReviews[i].rating; j++) {
@@ -1243,8 +1243,10 @@ function showDetailsPane(ev) {
     let tableContainer = document.getElementById('tableContainer');
     tableContainer.style.display = 'none';
 
-    // var tabInterface = document.getElementById('detailsContent');
-    // tabInterface.style.display = 'block';
+    console.log("show details");
+
+    var tabInterface = document.getElementById('detailsContent');
+    tabInterface.style.display = 'block';
 
     let favsContainer = document.getElementById('favTableContainer');
     if (favsContainer) {

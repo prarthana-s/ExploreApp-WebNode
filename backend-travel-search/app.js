@@ -15,8 +15,19 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 // var urlebody = bodyParser.urlencoded({ extended: false });
 
 app.use(express.static('public'));
+
+console.log(__dirname);
+
 app.get('/index.html', function(req,res) {
     res.sendFile( __dirname + "/" + "index.html");
+})
+
+app.get('/css/styles.css', function(req,res) {
+    res.sendFile( __dirname + "/css/styles.css");
+})
+
+app.get('/js/main.js', function(req,res) {
+    res.sendFile( __dirname + "/js/main.js");
 })
 
 app.use(function(req, res, next) {

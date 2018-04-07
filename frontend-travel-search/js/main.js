@@ -156,7 +156,7 @@ function submitForm() {
         if (!autocompleteFlag && formElems.namedItem("locationRadio").value == 'location') {
             $.ajax({
                 method: "GET",
-                url: "http://localhost:8081/geocode",
+                url: "http://travelyellowpages.us-east-2.elasticbeanstalk.com/geocode",
                 crossDomain: true,
                 data: {locationInput: formElems.namedItem("locationInput").value}
                 })
@@ -167,7 +167,7 @@ function submitForm() {
                     
                     $.ajax({
                         method: "GET",
-                        url: "http://localhost:8081/nearbyPlaces",
+                        url: "http://travelyellowpages.us-east-2.elasticbeanstalk.com/nearbyPlaces",
                         crossDomain: true,
                         data: {keyword: formElems.namedItem("keyword").value, category: formElems.namedItem("category").value, distance: formElems.namedItem("distance").value, locationRadio: formElems.namedItem("locationRadio").value, locationInput: formElems.namedItem("locationInput").value, hereLatitude: lat, hereLongitude: lon}
                         })
@@ -182,7 +182,7 @@ function submitForm() {
             // AJAX call to fetch nearby places JSON data
             $.ajax({
                 method: "GET",
-                url: "http://localhost:8081/nearbyPlaces",
+                url: "http://travelyellowpages.us-east-2.elasticbeanstalk.com/nearbyPlaces",
                 crossDomain: true,
                 data: {keyword: formElems.namedItem("keyword").value, category: formElems.namedItem("category").value, distance: formElems.namedItem("distance").value, locationRadio: formElems.namedItem("locationRadio").value, locationInput: formElems.namedItem("locationInput").value, hereLatitude: lat, hereLongitude: lon}
                 })
@@ -332,7 +332,7 @@ function displayNextResults(ev) {
 
     $.ajax({
         method: "GET",
-        url: "http://localhost:8081/nextPage",
+        url: "http://travelyellowpages.us-east-2.elasticbeanstalk.com/nextPage",
         crossDomain: true,
         data: {nextPageToken: nextPageToken}
         })
@@ -633,7 +633,7 @@ function processTableRowClick(ev){
 
                 $.ajax({
                     method: "GET",
-                    url: "http://localhost:8081/yelpReviews",
+                    url: "http://travelyellowpages.us-east-2.elasticbeanstalk.com/yelpReviews",
                     crossDomain: true,
                     data: yelpParams
                     })
@@ -824,16 +824,16 @@ function generateYelpReviews(yelpReviews, originalResult=0) {
     var yelpReviewsHTML = '';
 
     for (let i = 0 ; i < yelpReviews.length; i++) {
-        yelpReviewsHTML += '<div class="card"><div class="card-body"> \
-            <a target="_blank" href="' + yelpReviews[i].url + '"><img class="authorPic" src="' + yelpReviews[i].user.image_url + '"/></a>\
-            <a target="_blank" href="' + yelpReviews[i].url + '"><p class="card-text author-name authorName">' + yelpReviews[i].user.name + '</p></a>';
+        yelpReviewsHTML += '<div class="card"><div class="card-body"><div class="media"> \
+            <a target="_blank" href="' + yelpReviews[i].url + '"><img class="align-self-start mr-3 authorPic" src="' + yelpReviews[i].user.image_url +'" alt="Generic placeholder image"/></a>\
+            <div class="media-body"><a target="_blank" href="' + yelpReviews[i].url + '"><h6 class="mt-0 card-text author-name authorName">' + yelpReviews[i].user.name + '</h6></a>';
 
         for (let j = 0 ; j < yelpReviews[i].rating; j++) {
             yelpReviewsHTML += '<i class="fas fa-star filledStar"></i>';
         }
             
-        yelpReviewsHTML += '<span class="card-text text-muted time-stamp">' + yelpReviews[i].time_created + '</span>' + 
-            '<p class="card-text review-text">' + yelpReviews[i].text + '</p></div></div>';
+        yelpReviewsHTML += ' <span class="card-text text-muted time-stamp">' + yelpReviews[i].time_created + '</span>' + 
+            '<p class="card-text review-text">' + yelpReviews[i].text + '</p></div></div></div></div>';
     }
 
     var yelpReviewsContainer = document.getElementById('yelpReviews');
@@ -850,18 +850,18 @@ function generateGoogleReviews(googleReviews, originalResult=0) {
 
     for (let i = 0 ; i < googleReviews.length; i++) {
         var timestamp = moment(moment.unix(googleReviews[i].time)._d).format("YYYY-MM-DD HH:mm:ss");
-        googleReviewsHTML += '<div class="card"><div class="card-body"> \
-            <a target="_blank" href="' + googleReviews[i].author_url + '"><img class="authorPic" src="' + googleReviews[i].profile_photo_url + '"/></a>\
-            <a target="_blank" href="' + googleReviews[i].author_url + '"><p class="card-text author-name authorName">' + googleReviews[i].author_name + '</p></a>';
+        googleReviewsHTML += '<div class="card"><div class="card-body"><div class="media"> \
+            <a target="_blank" href="' + googleReviews[i].author_url + '"><img class="align-self-start mr-3 authorPic" src="' + googleReviews[i].profile_photo_url +'" alt="Generic placeholder image"/></a>\
+            <div class="media-body"><a target="_blank" href="' + googleReviews[i].author_url + '"><h6 class="mt-0 card-text author-name authorName">' + googleReviews[i].author_name + '</h6></a>';
 
         for (let j = 0 ; j < googleReviews[i].rating; j++) {
             googleReviewsHTML += '<i class="fas fa-star filledStar"></i>';
         }
             
-        googleReviewsHTML += '<span class="card-text text-muted time-stamp">' + timestamp + '</span>' + 
-            '<p class="card-text review-text">' + googleReviews[i].text + '</p></div></div>';
+        googleReviewsHTML += ' <span class="card-text text-muted time-stamp">' + timestamp + '</span>' + 
+            '<p class="card-text review-text">' + googleReviews[i].text + '</p></div></div></div></div>';
     }
-
+    
     var googleReviewsContainer = document.getElementById('googleReviews');
     googleReviewsContainer.innerHTML = googleReviewsHTML;
 }
@@ -924,52 +924,72 @@ function dropdownAction(ev) {
         let dropdownButton = document.getElementById('dropdownSort');
 
         if(ev.target.id == 'defaultOrderSort') {
-            generateYelpReviews(yelpReviewsSet,0);
-            generateGoogleReviews(googleReviewsSet,0);
+            if (yelpReviewsSet) {
+                generateYelpReviews(yelpReviewsSet,0);
+            }
+            if (googleReviewsSet) {
+                generateGoogleReviews(googleReviewsSet,0);
+            }
 
             dropdownButton.innerHTML = 'Default Order';
         }
         else if(ev.target.id == 'highestRatingSort') {
             let tempYelpReviews = JSON.parse(JSON.stringify(yelpReviewsSet));
-            tempYelpReviews.sort(compareValues('rating', 'desc'));
-            generateYelpReviews(tempYelpReviews,0);
+            if (tempYelpReviews) {
+                tempYelpReviews.sort(compareValues('rating', 'desc'));
+                generateYelpReviews(tempYelpReviews,0);
+            }
 
             let tempGoogleReviews = JSON.parse(JSON.stringify(googleReviewsSet));
-            tempGoogleReviews.sort(compareValues('rating', 'desc'));
-            generateGoogleReviews(tempGoogleReviews,0);
+            if (tempGoogleReviews) {
+                tempGoogleReviews.sort(compareValues('rating', 'desc'));
+                generateGoogleReviews(tempGoogleReviews,0);
+            }
 
             dropdownButton.innerHTML = 'Highest Rating';
         }
         else if(ev.target.id == 'lowestRatingSort') {
             let tempYelpReviews = JSON.parse(JSON.stringify(yelpReviewsSet));
-            tempYelpReviews.sort(compareValues('rating'));
-            generateYelpReviews(tempYelpReviews,0);
+            if (tempYelpReviews) {
+                tempYelpReviews.sort(compareValues('rating'));
+                generateYelpReviews(tempYelpReviews,0);
+            }
 
             let tempGoogleReviews = JSON.parse(JSON.stringify(googleReviewsSet));
-            tempGoogleReviews.sort(compareValues('rating'));
-            generateGoogleReviews(tempGoogleReviews,0);
+            if (tempGoogleReviews) {
+                tempGoogleReviews.sort(compareValues('rating'));
+                generateGoogleReviews(tempGoogleReviews,0);
+            }
 
             dropdownButton.innerHTML = 'Lowest Rating';
         }
         else if(ev.target.id == 'mostRecentSort') {
             let tempYelpReviews = JSON.parse(JSON.stringify(yelpReviewsSet));
-            tempYelpReviews.sort(compareValues('time_created','desc'));
-            generateYelpReviews(tempYelpReviews,0);
+            if (tempYelpReviews) {
+                tempYelpReviews.sort(compareValues('time_created','desc'));
+                generateYelpReviews(tempYelpReviews,0);
+            }
 
             let tempGoogleReviews = JSON.parse(JSON.stringify(googleReviewsSet));
-            tempGoogleReviews.sort(compareValues('time','desc'));
-            generateGoogleReviews(tempGoogleReviews,0);
+            if (tempGoogleReviews) {
+                tempGoogleReviews.sort(compareValues('time','desc'));
+                generateGoogleReviews(tempGoogleReviews,0);
+            }
 
             dropdownButton.innerHTML = 'Most Recent';
         }
         else if(ev.target.id == 'leastRecentSort') {
             let tempYelpReviews = JSON.parse(JSON.stringify(yelpReviewsSet));
-            tempYelpReviews.sort(compareValues('time_created'));
-            generateYelpReviews(tempYelpReviews,0);
+            if (tempYelpReviews) {
+                tempYelpReviews.sort(compareValues('time_created'));
+                generateYelpReviews(tempYelpReviews,0);
+            }
 
             let tempGoogleReviews = JSON.parse(JSON.stringify(googleReviewsSet));
-            tempGoogleReviews.sort(compareValues('time'));
-            generateGoogleReviews(tempGoogleReviews,0);
+            if (tempGoogleReviews) {
+                tempGoogleReviews.sort(compareValues('time'));
+                generateGoogleReviews(tempGoogleReviews,0);
+            }
 
             dropdownButton.innerHTML = 'Least Recent';
         }
@@ -1001,7 +1021,7 @@ function obtainMapFromCoords() {
         else {
             $.ajax({
                 method: "GET",
-                url: "http://localhost:8081/geocode",
+                url: "http://travelyellowpages.us-east-2.elasticbeanstalk.com/geocode",
                 crossDomain: true,
                 data: {locationInput: formElems.namedItem("fromLocation").value}
                 })
@@ -1032,11 +1052,6 @@ function getDirections(fromLat,fromLon,toLat,toLng){
         zoom: 15,
         center: destCoords
     }
-
-    map = new google.maps.Map(document.getElementById("mapContainer"), {
-        center: originCoords,
-        zoom: 15
-    });
 
     var map = new google.maps.Map(document.getElementById("mapContainer"), mapOptions);
     directionsDisplay.setMap(map);

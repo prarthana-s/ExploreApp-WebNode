@@ -137,6 +137,10 @@ vertical-align: middle;
     margin: 5px;
 }
 
+.jq-ry-container {
+    display: inline-block;
+}
+
 #dropdownButtons {
     margin: 15px;
 }

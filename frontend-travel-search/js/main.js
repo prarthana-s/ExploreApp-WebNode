@@ -1249,8 +1249,13 @@ function showDetailsPane(ev) {
 
     console.log("show details");
 
-    var tabInterface = document.getElementById('detailsContent');
-    tabInterface.style.display = 'block';
+    // var tabInterface = document.getElementById('detailsContent');
+    // tabInterface.style.display = 'block';
+
+    var scopeDetails = angular.element(document.getElementById('detailsContent')).scope();
+    scopeDetails.animateDetails = true;
+    scopeDetails.animateResults = false;
+    scopeDetails.$apply();
 
     let favsContainer = document.getElementById('favTableContainer');
     if (favsContainer) {

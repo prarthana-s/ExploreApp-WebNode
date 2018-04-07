@@ -156,7 +156,7 @@ function submitForm() {
         if (!autocompleteFlag && formElems.namedItem("locationRadio").value == 'location') {
             $.ajax({
                 method: "GET",
-                url: "http://travelyellowpages.us-east-2.elasticbeanstalk.com/geocode",
+                url: "http://localhost:8081/geocode",
                 crossDomain: true,
                 data: {locationInput: formElems.namedItem("locationInput").value}
                 })
@@ -167,7 +167,7 @@ function submitForm() {
                     
                     $.ajax({
                         method: "GET",
-                        url: "http://travelyellowpages.us-east-2.elasticbeanstalk.com/nearbyPlaces",
+                        url: "http://localhost:8081/nearbyPlaces",
                         crossDomain: true,
                         data: {keyword: formElems.namedItem("keyword").value, category: formElems.namedItem("category").value, distance: formElems.namedItem("distance").value, locationRadio: formElems.namedItem("locationRadio").value, locationInput: formElems.namedItem("locationInput").value, hereLatitude: lat, hereLongitude: lon}
                         })
@@ -182,7 +182,7 @@ function submitForm() {
             // AJAX call to fetch nearby places JSON data
             $.ajax({
                 method: "GET",
-                url: "http://travelyellowpages.us-east-2.elasticbeanstalk.com/nearbyPlaces",
+                url: "http://localhost:8081/nearbyPlaces",
                 crossDomain: true,
                 data: {keyword: formElems.namedItem("keyword").value, category: formElems.namedItem("category").value, distance: formElems.namedItem("distance").value, locationRadio: formElems.namedItem("locationRadio").value, locationInput: formElems.namedItem("locationInput").value, hereLatitude: lat, hereLongitude: lon}
                 })
@@ -332,7 +332,7 @@ function displayNextResults(ev) {
 
     $.ajax({
         method: "GET",
-        url: "http://travelyellowpages.us-east-2.elasticbeanstalk.com/nextPage",
+        url: "http://localhost:8081/nextPage",
         crossDomain: true,
         data: {nextPageToken: nextPageToken}
         })
@@ -482,7 +482,7 @@ function processTableRowClick(ev){
                 var todayDay = moment.utc(utc_offset).format("dddd");
                 var hours = results.opening_hours;
                 if (hours) {
-                    var dailyOpenModal = '<a href="#" data-toggle="modal" data-target="#exampleModalCenter">Daily Open Hours</a>';
+                    var dailyOpenModal = '&nbsp;&nbsp;&nbsp;<a href="#" id="dailyOpenLink" data-toggle="modal" data-target="#exampleModalCenter">Daily Open Hours</a>';
                     var weekdayText = hours.weekday_text;
 
                     for (let i = 0 ; i < weekdayText.length; i++) {
@@ -533,7 +533,8 @@ function processTableRowClick(ev){
 
                 $("#rateYo").rateYo({
                     rating: parseFloat(results.rating),
-                    starWidth: "15px"
+                    starWidth: "15px",
+                    normalFill: "transparent"
                 });
 
                 var infoFavButton = document.getElementsByClassName('infoFavIcon')[0];
@@ -598,12 +599,13 @@ function processTableRowClick(ev){
 
 
                 // Google Reviews
+                var googleReviewsContainer = document.getElementById('googleReviews');
+                googleReviewsContainer.innerHTML = '';
                 googleReviews = results.reviews;
                 if (googleReviews) {
                     generateGoogleReviews(googleReviews,1);
                 }
                 else {
-                    var googleReviewsContainer = document.getElementById('googleReviews');
                     googleReviewsContainer.innerHTML = '<div class="alert alert-warning" role="alert">No records.</div>';
                 }
 
@@ -631,18 +633,20 @@ function processTableRowClick(ev){
                 }
 
 
+                var yelpReviewsContainer = document.getElementById('yelpReviews');
+                yelpReviewsContainer.innerHTML = '';
                 $.ajax({
                     method: "GET",
-                    url: "http://travelyellowpages.us-east-2.elasticbeanstalk.com/yelpReviews",
+                    url: "http://localhost:8081/yelpReviews",
                     crossDomain: true,
                     data: yelpParams
                     })
                     .done(function( yelpReviews ) {
+                        console.log(yelpReviews);
                         if(yelpReviews.length) {
                             generateYelpReviews(yelpReviews,1);
                         }
                         else {
-                            var yelpReviewsContainer = document.getElementById('yelpReviews');
                             yelpReviewsContainer.innerHTML = '<div class="alert alert-warning" role="alert">No records.</div>';
                         }
                 });
@@ -1028,7 +1032,7 @@ function obtainMapFromCoords() {
         else {
             $.ajax({
                 method: "GET",
-                url: "http://travelyellowpages.us-east-2.elasticbeanstalk.com/geocode",
+                url: "http://localhost:8081/geocode",
                 crossDomain: true,
                 data: {locationInput: formElems.namedItem("fromLocation").value}
                 })

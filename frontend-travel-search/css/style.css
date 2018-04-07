@@ -12,6 +12,12 @@
 .col-form-label {
     font-weight: normal;
     margin-right: 30px;
+    font-weight: 500;
+}
+
+.redAsterisk {
+    color: red;
+    font-weight: bold;
 }
 
 .panel-body {
@@ -59,6 +65,7 @@ img.placeIcon {
 
 #mapContainer {
     height: 300px;
+    margin-bottom: 15px;
 }
 
 #gMapImg {
@@ -133,15 +140,54 @@ vertical-align: middle;
 #dropdownButtons {
     margin: 15px;
 }
-
+/* 
 form#mainForm {
     padding-top: 10px;
     padding-bottom: 15px;
     padding-left: 150px;
     padding-right: 50px;
-}
+} */
 
 #clearButton {
     background-color: white;
     border: 1px solid lightgray;
 }
+
+.detailsButton {
+    display: block;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.infoFav {
+    background-color: white;
+    border: solid .08em #eee;
+    border-radius: .1em;
+    padding: 6.5px;
+    border-radius: 3px;
+}
+
+#dailyOpenLink {
+    text-decoration: underline;
+}
+
+#directionsForm {
+    margin-top: 15px;
+}
+
+.fade1.ng-enter {
+    transition:0.5s linear all;
+    opacity:0;
+  }
+  
+  /* The finishing CSS styles for the enter animation */
+  .fade1.ng-enter.ng-enter-active {
+    opacity:1;
+  }
+  .fade1.ng-leave {
+    transition:0.5s linear all;
+    opacity:1;
+  }
+  .fade1.ng-leave.ng-leave-active {
+    opacity:0;
+  }

@@ -24,7 +24,7 @@
                 <form id="mainForm" onreset="resetFunc()" class="needs-validation" novalidate>
         
                     <div class="form-group row keywordElement">
-                        <label for="keyword" class="col-sm-2 col-form-label">Keyword*</label>
+                        <label for="keyword" class="col-sm-2 col-form-label">Keyword<span class="redAsterisk">*</span></label>
                         <div class="col-sm-8">
                             <input type="text" class="form-control" id="keyword" name="keyword" required>
                             <div class="invalid-feedback">
@@ -80,7 +80,7 @@
                         
                     <fieldset class="form-group">
                         <div class="row">
-                        <label for="formFrom" class="col-form-label col-sm-2">From*</label>
+                        <label for="formFrom" class="col-form-label col-sm-2">From<span class="redAsterisk">*</span></label>
                         <div class="col-sm-8">
                             <div class="form-check">
                             <input class="form-check-input" type="radio" id="locationRadioHere" name="locationRadio" value="here" checked='checked' required>
@@ -149,8 +149,8 @@
                     </button>
                 </div>
                 <div>
-                    <span class="infoFavIcon"><i class="far fa-star fa-1x fa-pull-left fa-border fav"></i></span>
-                    <a id="tweet" href="#">
+                    <span class="infoFavIcon"><i class="far fa-star fa-1x fa-pull-left fa-border infoFav"></i></span>
+                    <a id="tweet">
                         <img id="twitterButton" src="http://cs-server.usc.edu:45678/hw/hw8/images/Twitter.png">
                     </a>
                 </div>
@@ -242,8 +242,8 @@
                                     Google Reviews
                                 </button>
                                 <div class="dropdown-menu" id="reviewsToggle" aria-labelledby="dropdownReviews">
-                                    <a class="dropdown-item" id="googleReviewsButton" href="#">Google Reviews</a>
-                                    <a class="dropdown-item" id="yelpReviewsButton" href="#">Yelp Reviews</a>
+                                    <a class="dropdown-item" id="googleReviewsButton">Google Reviews</a>
+                                    <a class="dropdown-item" id="yelpReviewsButton">Yelp Reviews</a>
                                 </div>
                             </div>
                             
@@ -252,17 +252,17 @@
                                     Default Order:
                                 </button>
                                 <div class="dropdown-menu" id="reviewsSort" aria-labelledby="dropdownSort">
-                                    <a class="dropdown-item" id="defaultOrderSort" href="#">Default Order</a>
-                                    <a class="dropdown-item" id="highestRatingSort" href="#">Highest Rating</a>
-                                    <a class="dropdown-item" id="lowestRatingSort" href="#">Lowest Rating</a>
-                                    <a class="dropdown-item" id="mostRecentSort" href="#">Most Recent</a>
-                                    <a class="dropdown-item" id="leastRecentSort" href="#">Least Recent</a>
+                                    <a class="dropdown-item" id="defaultOrderSort">Default Order</a>
+                                    <a class="dropdown-item" id="highestRatingSort">Highest Rating</a>
+                                    <a class="dropdown-item" id="lowestRatingSort">Lowest Rating</a>
+                                    <a class="dropdown-item" id="mostRecentSort">Most Recent</a>
+                                    <a class="dropdown-item" id="leastRecentSort">Least Recent</a>
                                 </div>
                             </div>
                         </div>
 
-                        <div id="googleReviews"></div>
-                        <div id="yelpReviews" hidden></div>
+                        <div class="fade1" id="googleReviews"></div>
+                        <div class="fade1" id="yelpReviews" hidden></div>
                     </div>
                 </div>
             </div>

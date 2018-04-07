@@ -46,13 +46,13 @@ app.get('/geocode', function(req, res) {
     let url = `https://maps.googleapis.com/maps/api/geocode/json?address=${locationInput}&key=${googleKey}`
     request(url, function (err, response, body) {
         if(err){
+            res.send(null);
             console.log('error:', error);
         } else {
             body = JSON.parse(body);
             location.addr = body.results[0].formatted_address;
             location.lat = body.results[0].geometry.location.lat;
             location.lon = body.results[0].geometry.location.lng;
-            console.log(location);
             res.send(location);
         }
     });
@@ -87,7 +87,7 @@ app.get('/nearbyPlaces', function(req, res) {
     let url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lon}&radius=${radius}&type=${type}&keyword=${keyword}&key=${googleKey}`;
     request(url, function (err, response, body) {
         if(err){
-            console.log('error:', error);
+            res.send(null);;
         } else {
             body = JSON.parse(body);
             res.send(body);
@@ -108,6 +108,7 @@ app.get('/nextPage', function(req, res) {
 
     request(url, function (err, response, body) {
         if(err){
+            res.send(null);
             console.log('error:', error);
         } else {
             body = JSON.parse(body);
@@ -150,15 +151,15 @@ app.get('/yelpReviews', function(req, res) {
             client.reviews(id).then(response => {
                 res.send(response.jsonBody.reviews);
             }).catch(e => {
-                console.log(e);
+                res.send(null);
             });
 
         }
         else {
-            console.log("No reviews!");
+            res.send(null);
         }
     }).catch(e => {
-        console.log(e);
+        res.send(null);
     });
     
 });

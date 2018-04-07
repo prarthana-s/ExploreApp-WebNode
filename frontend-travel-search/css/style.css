@@ -110,3 +110,11 @@ vertical-align: middle;
 .animateResultsPanel.ng-hide {
     left: 1000px;
 }
+
+.reviewsCard {
+    margin: 5px;
+}
+
+#dropdownButtons {
+    margin: 15px;
+}

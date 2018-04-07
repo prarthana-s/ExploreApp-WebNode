@@ -824,7 +824,7 @@ function generateYelpReviews(yelpReviews, originalResult=0) {
     var yelpReviewsHTML = '';
 
     for (let i = 0 ; i < yelpReviews.length; i++) {
-        yelpReviewsHTML += '<div class="card"><div class="card-body"><div class="media"> \
+        yelpReviewsHTML += '<div class="card reviewsCard"><div class="card-body"><div class="media"> \
             <a target="_blank" href="' + yelpReviews[i].url + '"><img class="align-self-start mr-3 authorPic" src="' + yelpReviews[i].user.image_url +'" alt="Generic placeholder image"/></a>\
             <div class="media-body"><a target="_blank" href="' + yelpReviews[i].url + '"><h6 class="mt-0 card-text author-name authorName">' + yelpReviews[i].user.name + '</h6></a>';
 
@@ -850,7 +850,7 @@ function generateGoogleReviews(googleReviews, originalResult=0) {
 
     for (let i = 0 ; i < googleReviews.length; i++) {
         var timestamp = moment(moment.unix(googleReviews[i].time)._d).format("YYYY-MM-DD HH:mm:ss");
-        googleReviewsHTML += '<div class="card"><div class="card-body"><div class="media"> \
+        googleReviewsHTML += '<div class="card reviewsCard"><div class="card-body"><div class="media"> \
             <a target="_blank" href="' + googleReviews[i].author_url + '"><img class="align-self-start mr-3 authorPic" src="' + googleReviews[i].profile_photo_url +'" alt="Generic placeholder image"/></a>\
             <div class="media-body"><a target="_blank" href="' + googleReviews[i].author_url + '"><h6 class="mt-0 card-text author-name authorName">' + googleReviews[i].author_name + '</h6></a>';
 

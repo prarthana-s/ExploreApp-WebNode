@@ -778,22 +778,29 @@ function processTableRowClick(ev){
     }
     else if (target.className == 'delIcon') { 
         let placeID = target.dataset.placeid;
+        let startIndex = target.dataset.startindex;
         // Obtain local storage contents
         let favsArray = localStorage.getItem("favs");
 
         // Find place object in array and remove
         currentFavsArray = JSON.parse(favsArray);
-        for (let i = 0 ; i < currentFavsArray.length; i++) {
+        let curFavsArrayLen = currentFavsArray.length;
+        for (let i = 0 ; i < curFavsArrayLen; i++) {
             if (placeID in currentFavsArray[i]) {
                 currentFavsArray.splice(i, 1);
                 break;
             }
         }
+        
+        curFavsArrayLen = currentFavsArray.length;
+        if (curFavsArrayLen % 20 == 0) {
+            startIndex = curFavsArrayLen - 20;
+        }
 
         // Rewrite updated array to local storage
         localStorage.setItem("favs", JSON.stringify(currentFavsArray));
 
-        generateFavsTable(0);
+        generateFavsTable(startIndex);
     }
 }
 
@@ -1177,7 +1184,7 @@ function generateFavsTable(startingIndex=0) {
                 '<td><img class="placeIcon" src="' + icon + '" alt="user image"/></td>' + 
                 '<td class="placeName" data-placeid="' + placeID + '">' + name + '</td>' +
                 '<td class="addressInfo">' + address + '</td>' + 
-                '<td class="delIcon" data-index="' + i + '" data-placeID="' + placeID + '"><i class="fas fa-trash-alt fa-1x fa-pull-left fa-border fav"></i></td>' + 
+                '<td class="delIcon" data-index="' + i + '" data-placeID="' + placeID + '" data-startindex="' + startingIndex + '"><i class="fas fa-trash-alt fa-1x fa-pull-left fa-border fav"></i></td>' + 
                 '<td class="detailsIcon" data-index="' + i + '" data-lat="' + lat + '" data-lng="' + lng + '" data-placeID="' + placeID +
                 '"><i class="fas fa-chevron-right fa-1x fa-pull-left fa-border detailsArrow"></i></td></tr>';
             }

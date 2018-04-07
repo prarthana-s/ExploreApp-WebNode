@@ -11,6 +11,15 @@
 
 .col-form-label {
     font-weight: normal;
+    margin-right: 30px;
+}
+
+.panel-body {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding-top: 10px;
+    border: 1px solid#DCDCDC;
+    border-radius: 5px;
 }
 
 img.placeIcon {
@@ -123,4 +132,16 @@ vertical-align: middle;
 
 #dropdownButtons {
     margin: 15px;
+}
+
+form#mainForm {
+    padding-top: 10px;
+    padding-bottom: 15px;
+    padding-left: 150px;
+    padding-right: 50px;
+}
+
+#resetButton {
+    background-color: white;
+    border: 1px solid lightgray;
 }

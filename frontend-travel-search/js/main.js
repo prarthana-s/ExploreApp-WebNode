@@ -225,9 +225,9 @@ function constructResultsTable(result, currPageNumber) {
         }
 
         else {
-            tableHTML += '<div class="table-responsive animateResultsPanel" id="tableContainer" ng-show="animateResults">';
+            tableHTML += '<div class="animateResultsPanel" id="tableContainer" ng-show="animateResults">';
             tableHTML += '<button type="button" class="btn btn-outline-dark float-right detailsButton" disabled>Details<i class="fas fa-chevron-right fa-1x fa-float-right"></i></button>';
-            tableHTML += '<table class="table table-hover table-sm" id="placesTable">' + 
+            tableHTML += '<div class="table-responsive"><table class="table table-hover table-sm" id="placesTable">' + 
             '<tr><th scope="col">#</th>' + 
             '<th scope="col">Category</th>' + 
             '<th scope="col">Name</th>' + 
@@ -271,7 +271,7 @@ function constructResultsTable(result, currPageNumber) {
                 tableHTML += '<td class="detailsIcon" data-index="' + i + '" data-lat="' + lat + '" data-lng="' + lng + '" data-placeID="' + placeID +
                 '"><i class="fas fa-chevron-right fa-1x fa-pull-left fa-border detailsArrow"></i></td></tr>';
             }
-            tableHTML += '</table>';
+            tableHTML += '</table></div>';
         }
 
 
@@ -1147,7 +1147,7 @@ function generateFavsTable(startingIndex=0) {
         if (favItems.length) {
             favsInnerHTML = '<div class="table-responsive" id="favTableContainer">' +
             '<button type="button" class="btn btn-outline-dark float-right detailsButton" disabled>Details<i class="fas fa-chevron-right fa-1x fa-float-right"></i></button>' +  
-            '<table class="table table-hover table-sm" id="favsTable">' + 
+            '<table class="table table-hover table-sm table-responsive" id="favsTable">' + 
             '<tr><th scope="col">#</th>' + 
             '<th scope="col">Category</th>' + 
             '<th scope="col">Name</th>' + 

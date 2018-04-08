@@ -2,6 +2,7 @@ var app = angular.module('myApp', ['ngAnimate']);
 app.controller('myCtrl', function($scope) {
     $scope.animateDetails = false;
     $scope.animateResults = true;
+    $scope.animateReviews = true;
     // console.log($scope.animateDetails);
 });
 // This is defined globally to fetch the current script
@@ -30,6 +31,8 @@ var userSelectedLocation = null;
 var curLocObtained = false;
 var keywordIsValid = false;
 var locationIsValid = false;
+
+var map;
 
 // Enable Search button only after user's geolocation is fetched
 $.ajax({url: "http://ip-api.com/json", success: function(result){
@@ -217,7 +220,7 @@ function constructResultsTable(result, currPageNumber) {
 
         var existingTable = document.getElementById('tableContainer');
         if (existingTable) {
-            existingTable.parentNode.removeChild(existingTable);
+            existingTable.innerHTML = '';
         }
 
         if (!results.length) {
@@ -225,7 +228,7 @@ function constructResultsTable(result, currPageNumber) {
         }
 
         else {
-            tableHTML += '<div class="animateResultsPanel" id="tableContainer" ng-show="animateResults">';
+            // tableHTML += '<div id="tableContainer">';
             tableHTML += '<button type="button" class="btn btn-outline-dark float-right detailsButton" disabled>Details<i class="fas fa-chevron-right fa-1x fa-float-right"></i></button>';
             tableHTML += '<div class="table-responsive"><table class="table table-hover table-sm" id="placesTable">' + 
             '<tr><th scope="col">#</th>' + 
@@ -283,14 +286,14 @@ function constructResultsTable(result, currPageNumber) {
         if (nextPageToken && nextPageToken.length) {
             tableHTML += '<button type="button" id="nextButton" class="btn btn-outline-dark" data-token="' + nextPageToken + '">Next</button></div>';
         }
-        else {
-            tableHTML += '</div>';
-        }
+        // else {
+        //     tableHTML += '</div>';
+        // }
 
         // Hide progress bar
         document.getElementById('progressBar').setAttribute("hidden","hidden"); 
 
-        var tableContainer =  document.getElementById('pills-results');
+        var tableContainer =  document.getElementById('tableContainer');
         tableContainer.innerHTML = tableHTML;
 
         var placesTable = document.getElementById('placesTable');
@@ -410,7 +413,6 @@ function processTableRowClick(ev){
         // Show progress bar
         document.getElementById('progressBar').removeAttribute("hidden");
 
-        var map;
 
         function getInfo() {
             let locationCoordinates = {lat: parseFloat(lat), lng: parseFloat(lng)};
@@ -689,12 +691,13 @@ function processTableRowClick(ev){
         getInfo();
 
         // var scope = angular.element(document.getElementById('tableContainer'));
+        // console.log(scope);
         // scope.animateDetails = true;
         // scope.$apply();
-        var tableContainer = document.getElementById('tableContainer');
-        if (tableContainer) {
-            tableContainer.style.display = 'none';
-        }
+        // var tableContainer = document.getElementById('tableContainer');
+        // if (tableContainer) {
+        //     tableContainer.style.display = 'none';
+        // }
 
         // Hide progress bar
         document.getElementById('progressBar').setAttribute("hidden","hidden"); 
@@ -718,8 +721,8 @@ function processTableRowClick(ev){
 
         // var tabInterface = document.getElementById('detailsContent');
         // tabInterface.style.display = 'block';
-
-        var scopeDetails = angular.element(document.getElementById('detailsContent')).scope();
+        // console.log(angular.element(document.getElementById('body')).scope());
+        var scopeDetails = angular.element(document.getElementById('body')).scope();
         scopeDetails.animateDetails = true;
         scopeDetails.animateResults = false;
         scopeDetails.$apply();
@@ -821,7 +824,7 @@ function goBackToList(ev) {
     // let tabInterface = document.getElementById('detailsContent');
     // tabInterface.style.display = 'none';
 
-    var scopeDetails = angular.element(document.getElementById('detailsContent')).scope();
+    var scopeDetails = angular.element(document.getElementById('body')).scope();
     scopeDetails.animateDetails = false;
     scopeDetails.animateResults = true;
     scopeDetails.$apply();
@@ -909,21 +912,27 @@ function dropdownAction(ev) {
     // Toggle Reviews
 
     // TODO: Check if already being displayed
-    // Page rescrolls to top, FIX THIS
-    // Remove hidden and use display:none
     if (ev.target.parentNode.id == 'reviewsToggle') {
         
         let dropdownButton = document.getElementById('dropdownReviews');
 
         if (ev.target.id == 'yelpReviewsButton') {
-            document.getElementById('yelpReviews').removeAttribute("hidden");;
-            document.getElementById('googleReviews').setAttribute("hidden","hidden"); 
+            // document.getElementById('yelpReviews').removeAttribute("hidden");;
+            // document.getElementById('googleReviews').setAttribute("hidden","hidden"); 
+
+            var scopeDetails = angular.element(document.getElementById('body')).scope();
+            scopeDetails.animateReviews = false;
+            scopeDetails.$apply();
             
             dropdownButton.innerHTML = 'Yelp Reviews';
         }
         else if (ev.target.id == 'googleReviewsButton') {
-            document.getElementById('yelpReviews').setAttribute("hidden","hidden");
-            document.getElementById('googleReviews').removeAttribute("hidden");     
+            // document.getElementById('yelpReviews').setAttribute("hidden","hidden");
+            // document.getElementById('googleReviews').removeAttribute("hidden"); 
+            
+            var scopeDetails = angular.element(document.getElementById('body')).scope();
+            scopeDetails.animateReviews = true;
+            scopeDetails.$apply();
             
             dropdownButton.innerHTML = 'Google Reviews';
         }
@@ -1064,7 +1073,7 @@ function getDirections(fromLat,fromLon,toLat,toLng){
         center: destCoords
     }
 
-    var map = new google.maps.Map(document.getElementById("mapContainer"), mapOptions);
+    map = new google.maps.Map(document.getElementById("mapContainer"), mapOptions);
     directionsDisplay.setMap(map);
     directionsDisplay.setPanel(document.getElementById('directionsPanel'));
 
@@ -1244,10 +1253,8 @@ function processInfoFav(ev) {
 }
 
 function showDetailsPane(ev) {
-    let tableContainer = document.getElementById('tableContainer');
-    tableContainer.style.display = 'none';
-
-    console.log("show details");
+    // let tableContainer = document.getElementById('tableContainer');
+    // tableContainer.style.display = 'none';
 
     // var tabInterface = document.getElementById('detailsContent');
     // tabInterface.style.display = 'block';

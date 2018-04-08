@@ -14,7 +14,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular-animate.min.js"></script>
 </head>
 
-<body ng-app="myApp" ng-controller="myCtrl">
+<body id="body" ng-app="myApp" ng-controller="myCtrl">
     <div class="container">
         <div class="panel panel-default mainContainer">
             <div class="panel-body">
@@ -133,7 +133,9 @@
         </div>
 
         <div class="tab-content" id="pills-tabContent">
-            <div class="tab-pane fade show active" id="pills-results" role="tabpanel" aria-labelledby="pills-results-tab"></div>
+            <div class="tab-pane fade show active" id="pills-results" role="tabpanel" aria-labelledby="pills-results-tab" ng-show="animateResults">
+                <div id="tableContainer" class="animateResultsPanel" ng-show="animateResults"></div>
+            </div>
             <div class="tab-pane fade" id="pills-favorites" role="tabpanel" aria-labelledby="pills-favorites-tab"></div>
         </div>
 
@@ -261,8 +263,8 @@
                             </div>
                         </div>
 
-                        <div class="fade1" id="googleReviews"></div>
-                        <div class="fade1" id="yelpReviews" hidden></div>
+                        <div class="animateReviewsPanel" ng-show="animateReviews" id="googleReviews"></div>
+                        <div class="animateReviewsPanel" ng-hide="animateReviews" id="yelpReviews"></div>
                     </div>
                 </div>
             </div>

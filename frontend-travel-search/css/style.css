@@ -118,7 +118,7 @@ vertical-align: middle;
 
 .animateDetailsPanel.ng-hide {
     transition: all linear 0.5s;
-    right: 1000px;
+    right: 800px;
 }
 
 .animateResultsPanel {
@@ -131,7 +131,7 @@ vertical-align: middle;
 
 .animateResultsPanel.ng-hide {
     transition: all linear 0.5s;
-    left: 1000px;
+    left: 800px;
 }
 
 .animateReviewsPanel {

@@ -56,7 +56,7 @@ var listButton = document.getElementById('backToList');
 listButton.addEventListener('click',goBackToList,false);
 
 function resetFunc() {
-    document.getElementById('pills-results').innerHTML = '';
+    document.getElementById('tableContainer').innerHTML = '';
     document.getElementById('detailsContent').innerHTML = '';
     $('#pills-results-tab').tab('show')
 }
@@ -277,8 +277,6 @@ function constructResultsTable(result, currPageNumber) {
             tableHTML += '</table></div>';
         }
 
-
-
         if (prevPageFlag) {
             tableHTML += '<button type="button" id="prevButton" class="btn btn-outline-dark">Previous</button>';
         }
@@ -317,6 +315,12 @@ function constructResultsTable(result, currPageNumber) {
                 detailsButtons[i].style.display = 'block';
             }
         }
+        var scopeDetails = angular.element(document.getElementById('body')).scope();
+        scopeDetails.animateDetails = false;
+        scopeDetails.animateResults = true;
+        scopeDetails.$apply();
+
+        $('#pills-results-tab').tab('show');
     }
 }
 

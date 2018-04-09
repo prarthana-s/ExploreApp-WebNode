@@ -134,6 +134,20 @@ vertical-align: middle;
     left: 800px;
 }
 
+.animateFavsPanel {
+    transition: all linear 0.5s;
+    width: 100%;
+    background: white;
+    position: relative;
+    left: 0px;
+}
+
+.animateFavsPanel.ng-hide {
+    transition: all linear 0.5s;
+    left: 800px;
+}
+
+
 .animateReviewsPanel {
     transition: all linear 0.5s;
     width: 100%;
@@ -191,20 +205,3 @@ form#mainForm {
 #directionsForm {
     margin-top: 15px;
 }
-
-.fade1.ng-enter {
-    transition:0.5s linear all;
-    opacity:0;
-  }
-  
-  /* The finishing CSS styles for the enter animation */
-  .fade1.ng-enter.ng-enter-active {
-    opacity:1;
-  }
-  .fade1.ng-leave {
-    transition:0.5s linear all;
-    opacity:1;
-  }
-  .fade1.ng-leave.ng-leave-active {
-    opacity:0;
-  }

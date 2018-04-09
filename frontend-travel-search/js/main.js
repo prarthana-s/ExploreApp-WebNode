@@ -3,6 +3,7 @@ app.controller('myCtrl', function($scope) {
     $scope.animateDetails = false;
     $scope.animateResults = true;
     $scope.animateReviews = true;
+    $scope.animateFavs = true;
     // console.log($scope.animateDetails);
 });
 // This is defined globally to fetch the current script
@@ -318,6 +319,7 @@ function constructResultsTable(result, currPageNumber) {
         var scopeDetails = angular.element(document.getElementById('body')).scope();
         scopeDetails.animateDetails = false;
         scopeDetails.animateResults = true;
+        scopeDetails.animateFavs = true;
         scopeDetails.$apply();
 
         $('#pills-results-tab').tab('show');
@@ -724,10 +726,10 @@ function processTableRowClick(ev){
             }
         }
 
-        let favsContainer = document.getElementById('favTableContainer');
-        if (favsContainer) {
-            favsContainer.style.display = 'none';
-        }
+        // let favsContainer = document.getElementById('favTableContainer');
+        // if (favsContainer) {
+        //     favsContainer.style.display = 'none';
+        // }
         
 
         // var scopeFav = angular.element(document.getElementById('favTableContainer')).scope();
@@ -740,6 +742,7 @@ function processTableRowClick(ev){
         var scopeDetails = angular.element(document.getElementById('body')).scope();
         scopeDetails.animateDetails = true;
         scopeDetails.animateResults = false;
+        scopeDetails.animateFavs = false;
         scopeDetails.$apply();
 
         $('#info-tab').tab('show');
@@ -830,21 +833,27 @@ function processTableRowClick(ev){
 
 function goBackToList(ev) {
     if (ev.target.parentNode.dataset.from == 'results'){
-        let tableContainer = document.getElementById('tableContainer');
-        tableContainer.style.display = 'block';
+        // let tableContainer = document.getElementById('tableContainer');
+        // tableContainer.style.display = 'block';
+        var scopeDetails = angular.element(document.getElementById('body')).scope();
+        scopeDetails.animateDetails = false;
+        scopeDetails.animateResults = true;
+        scopeDetails.animateFavs = false;
+        scopeDetails.$apply();
     }
     else {
-        let favTableContainer = document.getElementById('favTableContainer');
-        favTableContainer.style.display = 'block';
+        // let favTableContainer = document.getElementById('favTableContainer');
+        // favTableContainer.style.display = 'block';
+        var scopeDetails = angular.element(document.getElementById('body')).scope();
+        scopeDetails.animateDetails = false;
+        scopeDetails.animateFavs = true;
+        scopeDetails.animateResults = false;
+        scopeDetails.$apply();
     }
 
     // let tabInterface = document.getElementById('detailsContent');
     // tabInterface.style.display = 'none';
 
-    var scopeDetails = angular.element(document.getElementById('body')).scope();
-    scopeDetails.animateDetails = false;
-    scopeDetails.animateResults = true;
-    scopeDetails.$apply();
 }
 
 function generateYelpReviews(yelpReviews, originalResult=0) {
@@ -856,8 +865,8 @@ function generateYelpReviews(yelpReviews, originalResult=0) {
 
     for (let i = 0 ; i < yelpReviews.length; i++) {
         yelpReviewsHTML += '<div class="card reviewsCard"><div class="card-body"><div class="media"> \
-            <a target="_blank" href="' + yelpReviews[i].url + '"><img class="align-self-start mr-3 yelpAuthorPic" src="' + yelpReviews[i].user.image_url +'" alt="Generic placeholder image"/></a>\
-            <div class="media-body"><a target="_blank" href="' + yelpReviews[i].url + '"><h6 class="mt-0 card-text author-name authorName">' + yelpReviews[i].user.name + '</h6></a>';
+            <a target="_blank" href="' + yelpReviews[i].url + '"><img class="align-self-start mr-3 yelpAuthorPic" src="' + (yelpReviews[i].user.image_url ?  yelpReviews[i].user.image_url : "") +'" alt="Generic placeholder image"/></a>\
+            <div class="media-body"><a target="_blank" href="' + (yelpReviews[i].url ? yelpReviews[i].url : "") + '"><h6 class="mt-0 card-text author-name authorName">' + yelpReviews[i].user.name + '</h6></a>';
 
         for (let j = 0 ; j < yelpReviews[i].rating; j++) {
             yelpReviewsHTML += '<i class="fas fa-star filledStar"></i>';
@@ -882,8 +891,8 @@ function generateGoogleReviews(googleReviews, originalResult=0) {
     for (let i = 0 ; i < googleReviews.length; i++) {
         var timestamp = moment(moment.unix(googleReviews[i].time)._d).format("YYYY-MM-DD HH:mm:ss");
         googleReviewsHTML += '<div class="card reviewsCard"><div class="card-body"><div class="media"> \
-            <a target="_blank" href="' + googleReviews[i].author_url + '"><img class="align-self-start mr-3 authorPic" src="' + googleReviews[i].profile_photo_url +'" alt="Generic placeholder image"/></a>\
-            <div class="media-body"><a target="_blank" href="' + googleReviews[i].author_url + '"><h6 class="mt-0 card-text author-name authorName">' + googleReviews[i].author_name + '</h6></a>';
+            <a target="_blank" href="' + googleReviews[i].author_url + '"><img class="align-self-start mr-3 authorPic" src="' + (googleReviews[i].profile_photo_url ? googleReviews[i].profile_photo_url : "") +'" alt="Generic placeholder image"/></a>\
+            <div class="media-body"><a target="_blank" href="' + (googleReviews[i].author_url ? googleReviews[i].author_url : "") + '"><h6 class="mt-0 card-text author-name authorName">' + googleReviews[i].author_name + '</h6></a>';
 
         for (let j = 0 ; j < googleReviews[i].rating; j++) {
             googleReviewsHTML += '<i class="fas fa-star filledStar"></i>';
@@ -1127,6 +1136,10 @@ $('a[data-toggle="pill"]').on('show.bs.tab', function (e) {
     if (e.target.id == 'pills-favorites-tab' ) {
         generateFavsTable(0);
         listButton.dataset.from = 'favs';
+        var scopeDetails = angular.element(document.getElementById('body')).scope();
+        scopeDetails.animateResults = false;
+        scopeDetails.animateFavs = true;
+        scopeDetails.$apply();
     }
 
     // Cross verify if favourited items still exist as favorited items
@@ -1162,11 +1175,15 @@ $('a[data-toggle="pill"]').on('show.bs.tab', function (e) {
                 }
             }
         }
+        var scopeDetails = angular.element(document.getElementById('body')).scope();
+        scopeDetails.animateResults = true;
+        scopeDetails.animateFavs = false;
+        scopeDetails.$apply();
     }
 })
 
 function generateFavsTable(startingIndex=0) {
-    let favsTab = document.getElementById('pills-favorites');
+    let favsTab = document.getElementById('favTableContainer');
     let favsInnerHTML = '';
     let showNextFavButton = false;
     let showPrevFavButton = false;
@@ -1175,8 +1192,8 @@ function generateFavsTable(startingIndex=0) {
         let length = favItems.length;
 
         if (favItems.length) {
-            favsInnerHTML = '<div class="table-responsive" id="favTableContainer">' +
-            '<button type="button" class="btn btn-outline-dark float-right detailsButton" disabled>Details<i class="fas fa-chevron-right fa-1x fa-float-right"></i></button>' +  
+            // favsInnerHTML = '<div class="table-responsive" id="favTableContainer">' +
+            favsInnerHTML = '<button type="button" class="btn btn-outline-dark float-right detailsButton" disabled>Details<i class="fas fa-chevron-right fa-1x fa-float-right"></i></button>' +  
             '<table class="table table-hover table-sm table-responsive" id="favsTable">' + 
             '<tr><th scope="col">#</th>' + 
             '<th scope="col">Category</th>' + 
@@ -1276,15 +1293,16 @@ function showDetailsPane(ev) {
     // var tabInterface = document.getElementById('detailsContent');
     // tabInterface.style.display = 'block';
 
-    var scopeDetails = angular.element(document.getElementById('detailsContent')).scope();
+    var scopeDetails = angular.element(document.getElementById('body')).scope();
     scopeDetails.animateDetails = true;
     scopeDetails.animateResults = false;
+    scopeDetails.animateFavs = false;
     scopeDetails.$apply();
 
-    let favsContainer = document.getElementById('favTableContainer');
-    if (favsContainer) {
-        favsContainer.style.display = 'none';
-    }
+    // let favsContainer = document.getElementById('favTableContainer');
+    // if (favsContainer) {
+    //     favsContainer.style.display = 'none';
+    // }
 }
 
 function processFavsTableClick(ev) {

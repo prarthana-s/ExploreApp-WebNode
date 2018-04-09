@@ -32,6 +32,7 @@ var userSelectedLocation = null;
 var curLocObtained = false;
 var keywordIsValid = false;
 var locationIsValid = false;
+var mapLocIsValid = true;
 
 var map;
 
@@ -278,16 +279,20 @@ function constructResultsTable(result, currPageNumber) {
             tableHTML += '</table></div>';
         }
 
+        tableHTML += '<div class="text-center">';
+
         if (prevPageFlag) {
             tableHTML += '<button type="button" id="prevButton" class="btn btn-outline-dark">Previous</button>';
         }
 
         if (nextPageToken && nextPageToken.length) {
-            tableHTML += '<button type="button" id="nextButton" class="btn btn-outline-dark" data-token="' + nextPageToken + '">Next</button></div>';
+            tableHTML += '<button type="button" id="nextButton" class="btn btn-outline-dark" data-token="' + nextPageToken + '">Next</button>';
         }
         // else {
         //     tableHTML += '</div>';
         // }
+
+        tableHTML += '</div>';
 
         // Hide progress bar
         document.getElementById('progressBar').setAttribute("hidden","hidden"); 
@@ -1194,7 +1199,7 @@ function generateFavsTable(startingIndex=0) {
         if (favItems.length) {
             // favsInnerHTML = '<div class="table-responsive" id="favTableContainer">' +
             favsInnerHTML = '<button type="button" class="btn btn-outline-dark float-right detailsButton" disabled>Details<i class="fas fa-chevron-right fa-1x fa-float-right"></i></button>' +  
-            '<table class="table table-hover table-sm table-responsive" id="favsTable">' + 
+            '<table class="table table-hover table-sm" id="favsTable">' + 
             '<tr><th scope="col">#</th>' + 
             '<th scope="col">Category</th>' + 
             '<th scope="col">Name</th>' + 
@@ -1395,3 +1400,27 @@ function activateSearchButton() {
         }
     }
 }
+
+var getDirectionsButton = document.getElementById('submitMapForm');
+
+function activateGetDirButton() {
+    if (mapLocIsValid) {
+        getDirectionsButton.removeAttribute('disabled'); 
+    }
+    else {
+        getDirectionsButton.setAttribute('disabled','disabled'); 
+    }
+}
+
+// Form validation
+$( "#fromLocation" ).keyup(function() {
+    let val = $('#fromLocation').val();
+    if (/\S/.test(val)){
+        mapLocIsValid = true; 
+        activateGetDirButton();
+    }
+    else {
+        mapLocIsValid = false;
+        activateGetDirButton();    
+    }
+});

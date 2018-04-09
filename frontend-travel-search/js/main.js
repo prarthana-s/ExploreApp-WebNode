@@ -648,7 +648,6 @@ function processTableRowClick(ev){
                     data: yelpParams
                     })
                     .done(function( yelpReviews ) {
-                        console.log(yelpReviews);
                         if(yelpReviews.length) {
                             generateYelpReviews(yelpReviews,1);
                         }
@@ -657,6 +656,17 @@ function processTableRowClick(ev){
                         }
                 });
 
+                // Reset Reviews to Google Reviews and Default Sort
+                var scopeDetails = angular.element(document.getElementById('body')).scope();
+                scopeDetails.animateReviews = true;
+                scopeDetails.$apply();
+                
+                let dropdownButtonReviews = document.getElementById('dropdownReviews');
+                dropdownButtonReviews.innerHTML = 'Google Reviews';
+
+                
+                let dropdownButtonSort = document.getElementById('dropdownSort');
+                dropdownButtonSort.innerHTML = 'Default Order';
 
                 // Map
                 let toFieldValue = results.name + ", " + results.formatted_address;
@@ -718,6 +728,7 @@ function processTableRowClick(ev){
         if (favsContainer) {
             favsContainer.style.display = 'none';
         }
+        
 
         // var scopeFav = angular.element(document.getElementById('favTableContainer')).scope();
         // scopeFav.animateDetails = true;
@@ -730,6 +741,8 @@ function processTableRowClick(ev){
         scopeDetails.animateDetails = true;
         scopeDetails.animateResults = false;
         scopeDetails.$apply();
+
+        $('#info-tab').tab('show');
 
     }
     else if (target.className == 'favIcon' || target.className == 'infoFavIcon') {

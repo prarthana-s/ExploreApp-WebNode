@@ -125,12 +125,12 @@ app.get('/yelpReviews', function(req, res) {
 
     let query = req.query;
     
-    let placeName = encodeURIComponent(query.name);
-    let placeAddress1 = encodeURIComponent(query.address1);
-    let placeCity = encodeURIComponent(query.city);
-    let placeState = encodeURIComponent(query.state);
-    let placeCountry = encodeURIComponent(query.country);
-    let placePostalCode = encodeURIComponent(query.postal_code);
+    let placeName = query.name;
+    let placeAddress1 = query.address1;
+    let placeCity = query.city;
+    let placeState = query.state;
+    let placeCountry = query.country;
+    let placePostalCode = query.postal_code;
     
     const yelp = require('yelp-fusion');
     
@@ -146,9 +146,12 @@ app.get('/yelpReviews', function(req, res) {
         country: placeCountry,
         postal_code: placePostalCode
     }).then(response => {
+        console.log(response);
         if (response.jsonBody.businesses.length != 0) {
             let id = response.jsonBody.businesses[0].id;
+            console.log(id);
             client.reviews(id).then(response => {
+                console.log(response);
                 res.send(response.jsonBody.reviews);
             }).catch(e => {
                 res.send(null);

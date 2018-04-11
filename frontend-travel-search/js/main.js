@@ -34,6 +34,10 @@ var keywordIsValid = false;
 var locationIsValid = false;
 var mapLocIsValid = true;
 
+var locationCoordinates;
+
+var directionsMode = false;
+
 var map;
 
 // Enable Search button only after user's geolocation is fetched
@@ -426,7 +430,7 @@ function processTableRowClick(ev){
 
 
         function getInfo() {
-            let locationCoordinates = {lat: parseFloat(lat), lng: parseFloat(lng)};
+            locationCoordinates = {lat: parseFloat(lat), lng: parseFloat(lng)};
             map = new google.maps.Map(document.getElementById('mapContainer'), {
                 center: locationCoordinates,
                 zoom: 14,
@@ -1062,6 +1066,8 @@ function obtainMapFromCoords() {
     var toLng = formElems.namedItem("toLongitude").value;
     
     var fromLat, fromLon;
+
+    directionsMode = true;
     
     if (!autocompleteMapFlag) {
         if (formElems.namedItem("fromLocation").value == 'My location' || formElems.namedItem("fromLocation").value == 'Your location' ){
@@ -1125,15 +1131,39 @@ function toggleStreetView() {
     var toggle = panorama.getVisible();
     var gMapImg = document.getElementById('gMapImg');
     var pegmanImg = document.getElementById('pegmanImg');
+    
     if (toggle == false) {
-      panorama.setVisible(true);
-      gMapImg.style.display = 'block';
-      pegmanImg.style.display = 'none';
+        map = new google.maps.Map(document.getElementById('mapContainer'), {
+            center: locationCoordinates,
+            zoom: 14,
+            streetViewControl: false
+        });
+    
+        var marker = new google.maps.Marker({
+            position: locationCoordinates,
+            map: map
+        });
+    
+        panorama = map.getStreetView();
+        panorama.setPosition(locationCoordinates);
+        panorama.setPov(/** @type {google.maps.StreetViewPov} */({
+            heading: 265,
+            pitch: 0
+        }));
+    
+        panorama.setVisible(true);
+        gMapImg.style.display = 'block';
+        pegmanImg.style.display = 'none';
     } 
     else {
-      panorama.setVisible(false);
-      gMapImg.style.display = 'none';
-      pegmanImg.style.display = 'block';
+        
+        if (directionsMode) {
+            obtainMapFromCoords();
+        }
+
+        panorama.setVisible(false);
+        gMapImg.style.display = 'none';
+        pegmanImg.style.display = 'block';
     }
 }
 

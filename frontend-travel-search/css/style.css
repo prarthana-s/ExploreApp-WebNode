@@ -209,3 +209,7 @@ form#mainForm {
 #nextButton {
     margin-left: 20px;
 }
+
+#sumbitMapLabel {
+    color: white;
+}

@@ -213,3 +213,7 @@ form#mainForm {
 #sumbitMapLabel {
     color: white;
 }
+
+.table-responsive {
+    white-space: nowrap;
+}

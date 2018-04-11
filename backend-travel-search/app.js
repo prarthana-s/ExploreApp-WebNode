@@ -146,12 +146,9 @@ app.get('/yelpReviews', function(req, res) {
         country: placeCountry,
         postal_code: placePostalCode
     }).then(response => {
-        console.log(response);
         if (response.jsonBody.businesses.length != 0) {
             let id = response.jsonBody.businesses[0].id;
-            console.log(id);
             client.reviews(id).then(response => {
-                console.log(response);
                 res.send(response.jsonBody.reviews);
             }).catch(e => {
                 res.send(null);
@@ -171,5 +168,3 @@ var port = process.env.PORT || 8081;
 app.listen(port, function() {
     console.log("Server started on port 8081");
 });
-
-

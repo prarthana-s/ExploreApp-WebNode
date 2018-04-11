@@ -229,7 +229,11 @@ function constructResultsTable(result, currPageNumber) {
             existingTable.innerHTML = '';
         }
 
-        if (!results.length) {
+        if (results == null) {
+            tableHTML = '<div class="alert alert-danger" role="alert">Failed to get search results.</div>';
+        }
+
+        else if (!results.length) {
             tableHTML = '<div class="alert alert-warning" role="alert">No records.</div>';
         }
 

@@ -463,8 +463,30 @@ function processTableRowClick(ev){
         
         // Checks that the PlacesServiceStatus is OK, and adds a marker
         // using the place ID and location from the PlacesService.
+        var detailsError = false;
+        var detailsErrorHTML = '';
         function callback(results, status) {
-            if (status == google.maps.places.PlacesServiceStatus.OK) {
+            if (results == null) {
+                detailsErrorHTML = '<div class="alert alert-danger" role="alert">Failed to get search results.</div>';
+                detailsError = true;
+
+                var details = document.getElementById('detailsContent');
+                details.setAttribute('hidden','hidden');
+
+                var noDetails = document.getElementById('noDetailsContent');
+                noDetails.innerHTML = detailsErrorHTML;
+                noDetails.removeAttribute('hidden');
+
+                // Hide progress bar
+                document.getElementById('progressBar').setAttribute("hidden", "hidden"); 
+
+                var scopeDetails = angular.element(document.getElementById('body')).scope();
+                scopeDetails.animateDetails = true;
+                scopeDetails.animateResults = false;
+                scopeDetails.animateFavs = false;
+                scopeDetails.$apply();
+            }
+            else if (status == google.maps.places.PlacesServiceStatus.OK) {
 
                 var headerDiv = document.getElementById('detailsHeader');
                 headerDiv.innerHTML = results.name;
@@ -715,50 +737,34 @@ function processTableRowClick(ev){
                 var text = 'Check out ' + results.name + ' located at ' + results.formatted_address + '. Website: ' + (results.website ? results.website : results.url);
                 
                 tweetButton.href = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&hashtags=TravelAndEntertainmentSearch'  ;
+                
+                // Hide progress bar
+                document.getElementById('progressBar').setAttribute("hidden","hidden"); 
+        
+                let detailsButtons = document.getElementsByClassName('detailsButton');
+                if (detailsButtons) {
+                    for (let i = 0 ; i < detailsButtons.length; i++) {
+                        detailsButtons[i].removeAttribute("disabled");
+                        detailsButtons[i].addEventListener('click',showDetailsPane,false);
+                    }
+                }
+
+                var details = document.getElementById('detailsContent');
+                details.removeAttribute('hidden');
+                
+                var noDetails = document.getElementById('noDetailsContent');
+                noDetails.setAttribute('hidden', 'hidden');
+        
+                var scopeDetails = angular.element(document.getElementById('body')).scope();
+                scopeDetails.animateDetails = true;
+                scopeDetails.animateResults = false;
+                scopeDetails.animateFavs = false;
+                scopeDetails.$apply();
+        
+                $('#info-tab').tab('show');
             }
         }
         getInfo();
-
-        // var scope = angular.element(document.getElementById('tableContainer'));
-        // console.log(scope);
-        // scope.animateDetails = true;
-        // scope.$apply();
-        // var tableContainer = document.getElementById('tableContainer');
-        // if (tableContainer) {
-        //     tableContainer.style.display = 'none';
-        // }
-
-        // Hide progress bar
-        document.getElementById('progressBar').setAttribute("hidden","hidden"); 
-
-        let detailsButtons = document.getElementsByClassName('detailsButton');
-        if (detailsButtons) {
-            for (let i = 0 ; i < detailsButtons.length; i++) {
-                detailsButtons[i].removeAttribute("disabled");
-                detailsButtons[i].addEventListener('click',showDetailsPane,false);
-            }
-        }
-
-        // let favsContainer = document.getElementById('favTableContainer');
-        // if (favsContainer) {
-        //     favsContainer.style.display = 'none';
-        // }
-        
-
-        // var scopeFav = angular.element(document.getElementById('favTableContainer')).scope();
-        // scopeFav.animateDetails = true;
-        // scopeFav.$apply();
-
-        // var tabInterface = document.getElementById('detailsContent');
-        // tabInterface.style.display = 'block';
-        // console.log(angular.element(document.getElementById('body')).scope());
-        var scopeDetails = angular.element(document.getElementById('body')).scope();
-        scopeDetails.animateDetails = true;
-        scopeDetails.animateResults = false;
-        scopeDetails.animateFavs = false;
-        scopeDetails.$apply();
-
-        $('#info-tab').tab('show');
 
     }
     else if (target.className == 'favIcon' || target.className == 'infoFavIcon') {

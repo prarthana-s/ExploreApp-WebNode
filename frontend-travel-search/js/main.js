@@ -852,8 +852,39 @@ function processTableRowClick(ev){
 
 function goBackToList(ev) {
     if (ev.target.parentNode.dataset.from == 'results'){
-        // let tableContainer = document.getElementById('tableContainer');
-        // tableContainer.style.display = 'block';
+        
+        listButton.dataset.from = 'results';
+        var allFavIcons = document.getElementsByClassName('favIcon');
+        if (allFavIcons) {
+            if ("favs" in localStorage) {
+                favsArray = localStorage.getItem("favs");
+            }
+
+            var favChecker = false;
+            for (let i = 0; i < allFavIcons.length; i++) {
+                let starElem = allFavIcons[i].childNodes[0];
+                let isFav = starElem.classList.contains('filledStar');
+                if (isFav) {
+                    placeID = allFavIcons[i].dataset.placeid;
+                    if (favsArray) {
+                        currentFavsArray = JSON.parse(favsArray);
+                        for (let i = 0; i < currentFavsArray.length; i++) {
+                            if (placeID in currentFavsArray[i]) {
+                                favChecker = true;
+                                break;
+                            }
+                        }
+                        if (!favChecker) {
+                            starElem.classList.remove("filledStar");
+                            starElem.classList.remove("fas");
+                            starElem.classList.add("far");
+                        }
+                        favChecker = false;
+                    }
+                }
+            }
+        }
+
         var scopeDetails = angular.element(document.getElementById('body')).scope();
         scopeDetails.animateDetails = false;
         scopeDetails.animateResults = true;
@@ -861,17 +892,14 @@ function goBackToList(ev) {
         scopeDetails.$apply();
     }
     else {
-        // let favTableContainer = document.getElementById('favTableContainer');
-        // favTableContainer.style.display = 'block';
+        generateFavsTable(0);
+        listButton.dataset.from = 'favs';
         var scopeDetails = angular.element(document.getElementById('body')).scope();
         scopeDetails.animateDetails = false;
         scopeDetails.animateFavs = true;
         scopeDetails.animateResults = false;
         scopeDetails.$apply();
     }
-
-    // let tabInterface = document.getElementById('detailsContent');
-    // tabInterface.style.display = 'none';
 
 }
 

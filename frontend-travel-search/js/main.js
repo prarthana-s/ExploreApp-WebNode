@@ -63,7 +63,11 @@ listButton.addEventListener('click',goBackToList,false);
 
 function resetFunc() {
     document.getElementById('tableContainer').innerHTML = '';
-    document.getElementById('detailsContent').innerHTML = '';
+    var scopeDetails = angular.element(document.getElementById('body')).scope();
+    scopeDetails.animateDetails = false;
+    scopeDetails.animateResults = true;
+    scopeDetails.$apply();
+    // document.getElementById('detailsContent').innerHTML = '';
     $('#pills-results-tab').tab('show')
 }
 

@@ -588,16 +588,16 @@ function processTableRowClick(ev){
                 var isFav = false;
                 if ("favs" in localStorage) {
                     favsArray = localStorage.getItem("favs");
-                }
-                if (favsArray) {
-                    currentFavsArray = JSON.parse(favsArray);
-                    for (let i = 0 ; i < currentFavsArray.length; i++) {
-                        if (placeID in currentFavsArray[i]) {
-                            starElem.classList.add("filledStar");
-                            starElem.classList.remove("far");
-                            starElem.classList.add("fas");
-                            isFav = true;
-                            break;
+                    if (favsArray) {
+                        currentFavsArray = JSON.parse(favsArray);
+                        for (let i = 0 ; i < currentFavsArray.length; i++) {
+                            if (placeID in currentFavsArray[i]) {
+                                starElem.classList.add("filledStar");
+                                starElem.classList.remove("far");
+                                starElem.classList.add("fas");
+                                isFav = true;
+                                break;
+                            }
                         }
                     }
                 }

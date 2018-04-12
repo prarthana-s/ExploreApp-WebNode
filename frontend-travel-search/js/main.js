@@ -852,7 +852,6 @@ function processTableRowClick(ev){
 
 function goBackToList(ev) {
     if (ev.target.parentNode.dataset.from == 'results'){
-        
         listButton.dataset.from = 'results';
         var allFavIcons = document.getElementsByClassName('favIcon');
         if (allFavIcons) {
@@ -864,8 +863,8 @@ function goBackToList(ev) {
             for (let i = 0; i < allFavIcons.length; i++) {
                 let starElem = allFavIcons[i].childNodes[0];
                 let isFav = starElem.classList.contains('filledStar');
+                placeID = allFavIcons[i].dataset.placeid;
                 if (isFav) {
-                    placeID = allFavIcons[i].dataset.placeid;
                     if (favsArray) {
                         currentFavsArray = JSON.parse(favsArray);
                         for (let i = 0; i < currentFavsArray.length; i++) {
@@ -878,6 +877,23 @@ function goBackToList(ev) {
                             starElem.classList.remove("filledStar");
                             starElem.classList.remove("fas");
                             starElem.classList.add("far");
+                        }
+                        favChecker = false;
+                    }
+                }
+                else {
+                    if (favsArray) {
+                        currentFavsArray = JSON.parse(favsArray);
+                        for (let i = 0; i < currentFavsArray.length; i++) {
+                            if (placeID in currentFavsArray[i]) {
+                                favChecker = true;
+                                break;
+                            }
+                        }
+                        if (favChecker) {
+                            starElem.classList.add("filledStar");
+                            starElem.classList.add("fas");
+                            starElem.classList.remove("far");
                         }
                         favChecker = false;
                     }
@@ -896,8 +912,8 @@ function goBackToList(ev) {
         listButton.dataset.from = 'favs';
         var scopeDetails = angular.element(document.getElementById('body')).scope();
         scopeDetails.animateDetails = false;
-        scopeDetails.animateFavs = true;
         scopeDetails.animateResults = false;
+        scopeDetails.animateFavs = true;
         scopeDetails.$apply();
     }
 
@@ -1229,8 +1245,8 @@ $('a[data-toggle="pill"]').on('show.bs.tab', function (e) {
             for (let i = 0 ; i < allFavIcons.length; i++) {
                 let starElem = allFavIcons[i].childNodes[0];
                 let isFav = starElem.classList.contains('filledStar');
+                placeID = allFavIcons[i].dataset.placeid;
                 if (isFav) {
-                    placeID = allFavIcons[i].dataset.placeid;
                     if (favsArray) {
                         currentFavsArray = JSON.parse(favsArray);
                         for (let i = 0 ; i < currentFavsArray.length; i++) {
@@ -1243,6 +1259,23 @@ $('a[data-toggle="pill"]').on('show.bs.tab', function (e) {
                             starElem.classList.remove("filledStar");
                             starElem.classList.remove("fas");
                             starElem.classList.add("far");
+                        }
+                        favChecker = false;
+                    }
+                }
+                else {
+                    if (favsArray) {
+                        currentFavsArray = JSON.parse(favsArray);
+                        for (let i = 0; i < currentFavsArray.length; i++) {
+                            if (placeID in currentFavsArray[i]) {
+                                favChecker = true;
+                                break;
+                            }
+                        }
+                        if (favChecker) {
+                            starElem.classList.add("filledStar");
+                            starElem.classList.add("fas");
+                            starElem.classList.remove("far");
                         }
                         favChecker = false;
                     }
@@ -1311,14 +1344,16 @@ function generateFavsTable(startingIndex=0) {
             }
             favsInnerHTML += '</table>';
 
+            favsInnerHTML += '<div class="text-center">';
+
             if (showPrevFavButton) {
-                favsInnerHTML += '<button type="button" id="prevFavsButton" class="btn btn-outline-dark" data-nextstartindex="' + (startingIndex-20) + '">Previous</button>';
+                favsInnerHTML += '<button type="button" id="prevFavsButton" class="btn btn-outline-dark" data-nextstartindex="' + (parseInt(startingIndex)-20) + '">Previous</button>';
             }
             
             if (showNextFavButton) {
-                favsInnerHTML += '<button type="button" id="nextFavsButton" class="btn btn-outline-dark" data-nextstartindex="' + (startingIndex+20) + '">Next</button>';
+                favsInnerHTML += '<button type="button" id="nextFavsButton" class="btn btn-outline-dark" data-nextstartindex="' + (parseInt(startingIndex)+20) + '">Next</button>';
             }
-            favsInnerHTML += '</div>';
+            favsInnerHTML += '</div></div>';
         }
         else {
             favsInnerHTML = '<div class="alert alert-warning" role="alert">No records.</div>';

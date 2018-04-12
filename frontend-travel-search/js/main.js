@@ -165,7 +165,7 @@ function submitForm() {
         if (!autocompleteFlag && formElems.namedItem("locationRadio").value == 'location') {
             $.ajax({
                 method: "GET",
-                url: "http://localhost:8081/geocode",
+                url: "http://travelyellowpages.us-east-2.elasticbeanstalk.com/geocode",
                 crossDomain: true,
                 data: {locationInput: formElems.namedItem("locationInput").value}
                 })
@@ -176,7 +176,7 @@ function submitForm() {
                     
                     $.ajax({
                         method: "GET",
-                        url: "http://localhost:8081/nearbyPlaces",
+                        url: "http://travelyellowpages.us-east-2.elasticbeanstalk.com/nearbyPlaces",
                         crossDomain: true,
                         data: {keyword: formElems.namedItem("keyword").value, category: formElems.namedItem("category").value, distance: formElems.namedItem("distance").value, locationRadio: formElems.namedItem("locationRadio").value, locationInput: formElems.namedItem("locationInput").value, hereLatitude: lat, hereLongitude: lon}
                         })
@@ -191,7 +191,7 @@ function submitForm() {
             // AJAX call to fetch nearby places JSON data
             $.ajax({
                 method: "GET",
-                url: "http://localhost:8081/nearbyPlaces",
+                url: "http://travelyellowpages.us-east-2.elasticbeanstalk.com/nearbyPlaces",
                 crossDomain: true,
                 data: {keyword: formElems.namedItem("keyword").value, category: formElems.namedItem("category").value, distance: formElems.namedItem("distance").value, locationRadio: formElems.namedItem("locationRadio").value, locationInput: formElems.namedItem("locationInput").value, hereLatitude: lat, hereLongitude: lon}
                 })
@@ -354,7 +354,7 @@ function displayNextResults(ev) {
 
     $.ajax({
         method: "GET",
-        url: "http://localhost:8081/nextPage",
+        url: "http://travelyellowpages.us-east-2.elasticbeanstalk.com/nextPage",
         crossDomain: true,
         data: {nextPageToken: nextPageToken}
         })
@@ -680,7 +680,7 @@ function processTableRowClick(ev){
                 yelpReviewsContainer.innerHTML = '';
                 $.ajax({
                     method: "GET",
-                    url: "http://localhost:8081/yelpReviews",
+                    url: "http://travelyellowpages.us-east-2.elasticbeanstalk.com/yelpReviews",
                     crossDomain: true,
                     data: yelpParams
                     })
@@ -1116,7 +1116,7 @@ function obtainMapFromCoords() {
         else {
             $.ajax({
                 method: "GET",
-                url: "http://localhost:8081/geocode",
+                url: "http://travelyellowpages.us-east-2.elasticbeanstalk.com/geocode",
                 crossDomain: true,
                 data: {locationInput: formElems.namedItem("fromLocation").value}
                 })
@@ -1211,6 +1211,7 @@ $('a[data-toggle="pill"]').on('show.bs.tab', function (e) {
         listButton.dataset.from = 'favs';
         var scopeDetails = angular.element(document.getElementById('body')).scope();
         scopeDetails.animateResults = false;
+        scopeDetails.animateDetails = false;
         scopeDetails.animateFavs = true;
         scopeDetails.$apply();
     }
@@ -1360,22 +1361,12 @@ function processInfoFav(ev) {
 }
 
 function showDetailsPane(ev) {
-    // let tableContainer = document.getElementById('tableContainer');
-    // tableContainer.style.display = 'none';
-
-    // var tabInterface = document.getElementById('detailsContent');
-    // tabInterface.style.display = 'block';
-
     var scopeDetails = angular.element(document.getElementById('body')).scope();
     scopeDetails.animateDetails = true;
     scopeDetails.animateResults = false;
     scopeDetails.animateFavs = false;
     scopeDetails.$apply();
 
-    // let favsContainer = document.getElementById('favTableContainer');
-    // if (favsContainer) {
-    //     favsContainer.style.display = 'none';
-    // }
 }
 
 function processFavsTableClick(ev) {
